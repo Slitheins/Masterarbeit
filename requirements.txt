@@ -1,0 +1,117 @@
+anyio==3.5.0
+argon2-cffi==21.3.0
+argon2-cffi-bindings==21.2.0
+asttokens==2.0.5
+attrs==21.4.0
+Babel==2.9.1
+backcall==0.2.0
+black==22.1.0
+bleach==4.1.0
+certifi==2021.10.8
+cffi==1.15.0
+charset-normalizer==2.0.11
+click==8.0.3
+colorama==0.4.4
+cycler @ file:///home/conda/feedstock_root/build_artifacts/cycler_1635519461629/work
+debugpy==1.5.1
+decorator==5.1.1
+defusedxml==0.7.1
+deprecation==2.1.0
+entrypoints==0.3
+executing==0.8.2
+fonttools @ file:///D:/bld/fonttools_1643722806906/work
+idna==3.3
+ipykernel==6.7.0
+ipython==8.0.1
+ipython-genutils==0.2.0
+ipywidgets==7.6.5
+jedi==0.18.1
+Jinja2==3.0.3
+json5==0.9.6
+jsonschema==4.4.0
+jupyter-client==7.1.2
+jupyter-core==4.9.1
+jupyter-packaging==0.11.1
+jupyter-server==1.13.4
+jupyterlab==3.2.8
+jupyterlab-pygments==0.1.2
+jupyterlab-server==2.10.3
+jupyterlab-widgets==1.0.2
+kiwisolver @ file:///D:/bld/kiwisolver_1635836893295/work
+MarkupSafe==2.0.1
+matplotlib @ file:///D:/bld/matplotlib-suite_1639359208125/work
+matplotlib-inline==0.1.3
+mistune==0.8.4
+munkres==1.1.4
+mypy-extensions==0.4.3
+nbclassic==0.3.5
+nbclient==0.5.10
+nbconvert==6.4.1
+nbformat==5.1.3
+nest-asyncio==1.5.4
+notebook==6.4.8
+numpy @ file:///D:/bld/numpy_1643009349017/work
+open3d==0.14.1
+packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1637239678211/work
+pandocfilters==1.5.0
+parso==0.8.3
+pathspec==0.9.0
+pickleshare==0.7.5
+Pillow @ file:///D:/bld/pillow_1645323413835/work
+platformdirs==2.4.1
+prometheus-client==0.13.1
+prompt-toolkit==3.0.26
+pure-eval==0.2.2
+pycparser==2.21
+Pygments==2.11.2
+pyparsing @ file:///home/conda/feedstock_root/build_artifacts/pyparsing_1642753572664/work
+PyQt5==5.12.3
+PyQt5_sip==4.19.18
+PyQtChart==5.12
+PyQtWebEngine==5.12.1
+pyrsistent==0.18.1
+python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/python-dateutil_1626286286081/work
+pytz==2021.3
+pywin32==303
+pywinpty==2.0.1
+pyzmq==22.3.0
+requests==2.27.1
+Send2Trash==1.8.0
+six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
+sniffio==1.2.0
+stack-data==0.1.4
+terminado==0.13.1
+testpath==0.5.0
+tomli==2.0.0
+tomlkit==0.8.0
+tornado @ file:///D:/bld/tornado_1635819745510/work
+traitlets==5.1.1
+typing_extensions==4.0.1
+unicodedata2 @ file:///D:/bld/unicodedata2_1640031227379/work
+urllib3==1.26.8
+wcwidth==0.2.5
+webencodings==0.5.1
+websocket-client==1.2.3
+widgetsnbextension==3.5.2
+wincertstore==0.2
+
+numpy~=1.22.3
+pillow~=9.0.1
+zlib~=1.2.11
+pip~=22.0.4
+wheel~=0.37.1
+brotli~=1.0.9
+openssl~=1.1.1n
+tornado~=6.1
+setuptools~=60.10.0
+six~=1.16.0
+python-dateutil~=2.8.2
+matplotlib~=3.5.1
+fonttools~=4.30.0
+freetype~=2.10.4
+unicodedata2~=14.0.0
+pyparsing~=3.0.7
+cycler~=0.11.0
+packaging~=21.3
+kiwisolver~=1.4.0
+pandas~=1.4.1
