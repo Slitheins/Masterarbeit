@@ -137,13 +137,13 @@ class PhotoSet:
 
         '''
         if exist_dict == False:
-            image_list_l = sorted(glob.glob(self._path + '//' + '*_1.jpg'))
-            # image_list_l = sorted(glob.glob(self._path + '//' + 'left*.jpg'))
-            #
+            # image_list_l = sorted(glob.glob(self._path + '//' + '*_1.jpg'))
+            image_list_l = sorted(glob.glob(self._path + '//' + '*1.png'))
             for i, image in enumerate(image_list_l):
                 write_name = self._save_dir_l + '//' + 'Image_' + str(i) + '.png'
                 img = cv2.imread(image)
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                img = np.rot90(img, 1)
                 # img = self.resize(img)
                 # print('gray ', gray )
                 cv2.imwrite(write_name, img)
@@ -151,11 +151,12 @@ class PhotoSet:
                 self._images_l.append(img)
             print("{} photos in this directory are read".format(len(self._images_l)))
 
-            image_list_r = sorted(glob.glob(self._path + '//' + '*_2.jpg'))
-            # image_list_r = sorted(glob.glob(self._path + '//' + 'right*.jpg'))
+            # image_list_r = sorted(glob.glob(self._path + '//' + '*_2.jpg'))
+            image_list_r = sorted(glob.glob(self._path + '//' + '*2.png'))
             for j, image in enumerate(image_list_r):
                 write_name = self._save_dir_r + '//' + 'Image_' + str(j) + '.png'
                 img = cv2.imread(image)
+                img = np.rot90(img, 1)
                 # img = self.resize(img)
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 # img = np.uint8(np.clip((cv2.add(1 * gray, 40)), 0, 255))
@@ -331,6 +332,24 @@ class CameraCalibration:
         self.world_points = np.zeros((w_nums * h_nums, 3), np.float32)
         self.world_points[:, :2] = np.mgrid[0:w_nums, 0:h_nums].T.reshape(-1, 2)
 
+        cameramatrix = np.array([[7.77777778e+03, 0., 1.526e+03],
+                                 [0., 7.77777778e+03, 2.048e+03],
+                                 [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
+
+        flags = 0
+        # # # 如果该标志被设置，那么就会固定输入的cameraMatrix和distCoeffs不变，只求解R,T,E,F.
+        flags |= cv2.CALIB_FIX_INTRINSIC
+        # # 根据用户提供的cameraMatrix和distCoeffs为初始值开始迭代
+        # flags |= cv2.CALIB_USE_INTRINSIC_GUESS
+        # 迭代过程中不会改变焦距
+        # flags |= cv2.CALIB_FIX_FOCAL_LENGTH
+        # flags |= cv2.CALIB_ZERO_TANGENT_DIST
+        # flags |= cv2.CALIB_SAME_FOCAL_LENGTH
+        # flags |= cv2.CALIB_FIX_K6 + cv2.CALIB_FIX_K6
+        # flags |= cv2.CALIB_RATIONAL_MODEL
+        # # # 切向畸变保持为零
+
+
         print(r"ChArUco with the height {} and the width {} is chosen".format(w_nums, h_nums))
 
         i = 0
@@ -340,6 +359,7 @@ class CameraCalibration:
             cv2.namedWindow('imshow', cv2.WINDOW_FREERATIO)
             cv2.waitKey(5000)
             resize_l = self.resize(gray)
+            print('resize_l', resize_l)
             corners_l, ids, rejected = cv2.aruco.detectMarkers(gray, dictionary)
             # print("*" * 50)
             # print(rejected)
@@ -370,7 +390,7 @@ class CameraCalibration:
             #     cv2.drawChessboardCorners(fname, (w_nums, h_nums), charucoCorners_l, ret)
             #     cv2.namedWindow('findCorners', cv2.WINDOW_FREERATIO)
             #     cv2.imshow('findCorners', fname)
-            #     cv2.waitKey(5000)
+            #     cv2.waitKey(50000)
             # cv2.destroyAllWindows()
 
         j = 0
@@ -394,7 +414,7 @@ class CameraCalibration:
             #     cv2.drawChessboardCorners(fname, (w_nums, h_nums), charucoCorners_r, ret)
             #     cv2.namedWindow('findCorners2', cv2.WINDOW_FREERATIO)
             #     cv2.imshow('findCorners2', fname)
-            #     cv2.waitKey(5000)
+            #     cv2.waitKey(50000)
             # cv2.destroyAllWindows()
 
         # left and right camera are calibrated separately to obtain the intrinsic parameters
@@ -403,11 +423,21 @@ class CameraCalibration:
         # ret_r, self.mtx_r, self.dist_r, self.rvecs_r, self.tvecs_r = cv2.aruco.calibrateCameraCharuco(
         #     self.allCorners_r, self.allIds_r, board, (w_nums, h_nums), None, None, flags=0, criteria=(cv2.TERM_CRITERIA_EPS & cv2.TERM_CRITERIA_COUNT, 10000, 1e-5))
         ret_l, self.mtx_l, self.dist_l, self.rvecs_l, self.tvecs_l = cv2.calibrateCamera(
-            self.objpoints, self.allCorners_l, resize_l, None, None, criteria=(cv2.TERM_CRITERIA_EPS & cv2.TERM_CRITERIA_COUNT, 1000, 1e-5))
+            self.objpoints, self.allCorners_l, resize_l, cameraMatrix=cameramatrix, distCoeffs=None, flags=0, criteria=(cv2.TERM_CRITERIA_EPS & cv2.TERM_CRITERIA_COUNT, 100, 1e-5))
         ret_r, self.mtx_r, self.dist_r, self.rvecs_r, self.tvecs_r = cv2.calibrateCamera(
-            self.objpoints, self.allCorners_r, resize_r, None, None,  criteria=(cv2.TERM_CRITERIA_EPS & cv2.TERM_CRITERIA_COUNT, 1000, 1e-5))
-        print('ret_l:',ret_l)
-        print('ret_r:',ret_r)
+            self.objpoints, self.allCorners_r, resize_r, cameraMatrix=cameramatrix, distCoeffs=None, flags=0, criteria=(cv2.TERM_CRITERIA_EPS & cv2.TERM_CRITERIA_COUNT, 100, 1e-5))
+        # print(self.mtx_l, self.dist_l,self.mtx_r, self.dist_r)
+        stereocalib_criteria = (cv2.TERM_CRITERIA_MAX_ITER + cv2.TERM_CRITERIA_EPS, 100, 1e-5)
+        ret, M1, d1, M2, d2, R, T, E, F = cv2.stereoCalibrate(self.objpoints, self.allCorners_l, self.allCorners_r,
+                                                              self.mtx_l, self.dist_l, self.mtx_r, self.dist_r, (4096,3072),
+                                                              criteria=stereocalib_criteria, flags=flags)
+        # self.camera_model = dict([('rms', ret), ('M1', self.mtx_l), ('M2', self.mtx_r), ('dist1', self.dist_l),
+        #                           ('dist2', self.dist_r), ('R', R), ('T', T),
+        #                           ('E', E), ('F', F), ('dims', resize_l)])
+        self.camera_model = dict([('rms', ret), ('M1', M1), ('M2', M2), ('dist1', d1),
+                                  ('dist2', d2), ('R', R), ('T', T),
+                                  ('E', E), ('F', F), ('dims', resize_l)])
+        print(self.camera_model)
         return resize_l
 
 
@@ -700,10 +730,10 @@ class CameraCalibration:
         # # # 如果该标志被设置，那么就会固定输入的cameraMatrix和distCoeffs不变，只求解R,T,E,F.
         # flags |= cv2.CALIB_FIX_INTRINSIC
         # # 根据用户提供的cameraMatrix和distCoeffs为初始值开始迭代
-        # flags |= cv2.CALIB_USE_INTRINSIC_GUESS
+        flags |= cv2.CALIB_USE_INTRINSIC_GUESS
         # 迭代过程中不会改变焦距
         # flags |= cv2.CALIB_FIX_FOCAL_LENGTH
-        flags |= cv2.CALIB_SAME_FOCAL_LENGTH
+        # flags |= cv2.CALIB_SAME_FOCAL_LENGTH
         # # # 切向畸变保持为零
         # flags |= cv2.CALIB_FIX_PRINCIPAL_POINT
         # flags |= cv2.CALIB_ZERO_TANGENT_DIST
@@ -731,13 +761,13 @@ class CameraCalibration:
         stereocalib_criteria = (cv2.TERM_CRITERIA_MAX_ITER + cv2.TERM_CRITERIA_EPS, 100, 1e-5)
         stereocalib_criteria2 = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_COUNT, 100, 1e-3)
 
-        ret, M1, d1, M2, d2, R, T, E, F = cv2.stereoCalibrate(self.objpoints, self.imgpoints_l, self.imgpoints_r,
-                                                              self.mtx_l, self.dist_l, self.mtx_r, self.dist_r, dims,
-                                                              criteria=stereocalib_criteria,
-                                                              flags=flags)
-        # ret, M1, d1, M2, d2, R, T, E, F = cv2.stereoCalibrate(self.objpoints, self.allCorners_l, self.allCorners_r,
+        # ret, M1, d1, M2, d2, R, T, E, F = cv2.stereoCalibrate(self.objpoints, self.imgpoints_l, self.imgpoints_r,
         #                                                       self.mtx_l, self.dist_l, self.mtx_r, self.dist_r, dims,
-        #                                                       flags=cv2.CALIB_RATIONAL_MODEL, criteria=stereocalib_criteria)
+        #                                                       criteria=stereocalib_criteria,
+        #                                                       flags=flags)
+        ret, M1, d1, M2, d2, R, T, E, F = cv2.stereoCalibrate(self.objpoints, self.allCorners_l, self.allCorners_r,
+                                                              self.mtx_l, self.dist_l, self.mtx_r, self.dist_r, dims,
+                                                              flags=cv2.CALIB_RATIONAL_MODEL, criteria=stereocalib_criteria)
 
         self.camera_model = dict([('rms', ret), ('M1', M1), ('M2', M2), ('dist1', d1),
                                   ('dist2', d2), ('R', R), ('T', T),
@@ -776,8 +806,8 @@ class CameraCalibration:
             dims= self._circle_calibrater(args[0], args[1], args[2])
             # self.validate_square()
             # self.validate_square_2()
-        self.stereocalibrate(dims)
-        self.save_txt
+        # self.stereocalibrate(dims)
+        # self.save_txt
         return self.camera_model
 
 
@@ -825,7 +855,7 @@ class StereoRectify():
         # 记得对alpha调参，出来的图像可能是黑色的
         # Q是深度差异映射矩阵
         R1, R2, P1, P2, Q, roi1, roi2 = cv2.stereoRectify(self.cameraMatrix_l, self.dist_l, self.cameraMatrix_r, self.dist_r,
-                                                          (self.dims[1], self.dims[0]), self.R, self.T, flags = 0, alpha = 0.63
+                                                          (self.dims[0], self.dims[1]), self.R, self.T, flags = 0, alpha = -1
                                                           )
         # R1[0, :] *= -1
         # R2[0, :] *= -1
@@ -865,9 +895,11 @@ class StereoRectify():
             ('stereo_left_mapx', self.map1x),
             ('stereo_left_mapy', self.map1y),
             ('stereo_right_mapx', self.map2x),
-            ('stereo_right_mapy', self.map2y)
+            ('stereo_right_mapy', self.map2y),
+            ('roi1', roi1),
+            ('roi2', roi2)
         ])
-        # print('rectify_model:',rectify_model)
+        print('rectify_model:',rectify_model)
         # self.save_txt(self, path)
         return rectify_model
 
@@ -902,15 +934,15 @@ class StereoRectify():
         #             rectified_img1)
         # cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\result2.png',
         #             rectified_img2)
-        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\result1.png',
+        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\result1.png',
                     rectified_img1)
-        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\result2.png',
+        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\result2.png',
                     rectified_img2)
         result = np.concatenate((rectified_img1, rectified_img2), axis=1)
         resize = cv2.resize(result, (1024, 384))
         # cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\result3.png',
         #             result)
-        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\result3.png',
+        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\result3.png',
                     result)
         cv2.imshow("rec.png", result)
         cv2.waitKey(3000)
@@ -939,11 +971,13 @@ class StereoRectify():
         # 绘制等间距平行线
         line_interval = 50  # 直线间隔：50
         for k in range(height // line_interval):
-            cv2.line(output, (0, line_interval * (k + 1)), (2 * width, line_interval * (k + 1)), (0, 255, 0),
+            cv2.line(output, (0, line_interval * (2*k )), (2 * width, line_interval * (2*k )), (0, 255, 0),
+                     thickness=2, lineType=cv2.LINE_AA)
+            cv2.line(output, (0, line_interval * (2*k + 1)), (2 * width, line_interval * (2*k + 1)), (0, 0, 255),
                      thickness=2, lineType=cv2.LINE_AA)
         cv2.imshow("withlines", output)
         # cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\withlines.png', output)
-        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\withlines.png', output)
+        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\withlines.png', output)
         cv2.waitKey(8000)
 
 
@@ -967,31 +1001,32 @@ class StereoRectify():
         # blockSize = [3, 5, 7, 15]
         # uniquenessRatui = [5, 10, 15]
         #
-        blockSize = 9 #3
-        paraml = {'minDisparity': 510,
-                  'numDisparities': 20 * 16,  #128
-                  'blockSize': blockSize,
+        blockSize = 7 #3
+        paraml = {'minDisparity': -16,
+                  'numDisparities': 32*16,  #128
+                  'blockSize': 5,
                   'P1': 8 * img_channels * blockSize ** 2,  #8
-                  'P2': 32 * img_channels * blockSize ** 2,  #32
-                  'disp12MaxDiff': -1,  #1 # non-positive vaalue to disable the check
+                  'P2': 24 * img_channels * blockSize ** 2,  #32
+                  'disp12MaxDiff': 1,  #1 # non-positive vaalue to disable the check
                   'preFilterCap': 31,
                   'uniquenessRatio': 10,   #15
-                  'speckleWindowSize': 0, #100  Set it to 0 to disable speckle filtering. Otherwise, set it somewhere in the 50-200 range
-                  'speckleRange': 2, #7
+                  'speckleWindowSize': 100, #100  Set it to 0 to disable speckle filtering. Otherwise, set it somewhere in the 50-200 range
+                  'speckleRange': 4, #7
                   'mode': cv2.STEREO_SGBM_MODE_SGBM_3WAY
                   }
 
         # cread the SGBM instance
         left_matcher = cv2.StereoSGBM_create(**paraml)
         paramr = paraml
-        paramr['minDisparity'] = -paraml['numDisparities']
+        # paramr['minDisparity'] = -paraml['numDisparities']
+        # paramr['numDisparities'] = paraml['minDisparity']
         # paramr['minDisparity'] = -15*16
         right_matcher = cv2.StereoSGBM_create(**paramr)
 
         # Filter Parameters
         lmbda = 80000
         # sigma = [0.7, 1.2, 1.5]
-        sigma = 1.3
+        sigma = 1.2
         visual_multiplier = 1.0 # 1.0
 
         # wsl filter are used to smooth the depthmap
@@ -1002,7 +1037,9 @@ class StereoRectify():
         # calculate the disparity map
         print('computing disparity...')
         displ = left_matcher.compute(left_image, right_image)  # .astype(np.float32)/16
+        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\dl.png', displ)
         dispr = right_matcher.compute(right_image, left_image)  # .astype(np.float32)/16
+        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\dr.png', dispr)
         displ = np.int16(displ)
         dispr = np.int16(dispr)
         filteredImg = wls_filter.filter(displ, left_image, None, dispr)  # important to put "imgL" here!!!
@@ -1010,7 +1047,7 @@ class StereoRectify():
         filteredImg = cv2.normalize(src=filteredImg, dst=filteredImg, beta=0, alpha=255, norm_type=cv2.NORM_MINMAX);
         filteredImg = np.uint8(filteredImg)
         cv2.imshow('Disparity Map', filteredImg)
-        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\depthmap.png', filteredImg)
+        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\depthmap.png', filteredImg)
         cv2.waitKey()
         cv2.destroyAllWindows()
 
@@ -1042,20 +1079,20 @@ class StereoRectify():
     def depth_map(self, imgL, imgR, sigma=0.7):
         """ Depth map calculation. Works with SGBM and WLS. Need rectified images, returns depth map ( left to right disparity ) """
         # SGBM Parameters -----------------
-        window_size = 3  # wsize default 3; 5; 7 for SGBM reduced size image; 15 for SGBM full size image (1300px and above); 5 Works nicely
+        window_size = 31  # wsize default 3; 5; 7 for SGBM reduced size image; 15 for SGBM full size image (1300px and above); 5 Works nicely
 
         left_matcher = cv2.StereoSGBM_create(
-            minDisparity=-1,
-            numDisparities=5 * 16,  # max_disp has to be dividable by 16 f. E. HH 192, 256
+            minDisparity= 50,
+            numDisparities= 10 * 16,  # max_disp has to be dividable by 16 f. E. HH 192, 256
             blockSize=window_size,
             P1=8 * 3 * window_size ** 2,
             # wsize default 3; 5; 7 for SGBM reduced size image; 15 for SGBM full size image (1300px and above); 5 Works nicely
             P2=32 * 3 * window_size ** 2,
-            disp12MaxDiff=12, # default value = 1
-            uniquenessRatio=10,
-            speckleWindowSize=50, # opencv example = 100
-            speckleRange=32, # oepncv example = 10
-            preFilterCap=63, # default =15, opencv example=63
+            disp12MaxDiff= 12, # default value = 1
+            uniquenessRatio= 10,
+            speckleWindowSize= 50, # opencv example = 100
+            speckleRange= 32, # oepncv example = 10
+            preFilterCap= 63, # default =15, opencv example=63
             mode=cv2.STEREO_SGBM_MODE_SGBM_3WAY
         )
         # left_matcher = cv2.StereoSGBM_create(
@@ -1089,7 +1126,7 @@ class StereoRectify():
 
         filteredImg = cv2.normalize(src=filteredImg, dst=filteredImg, beta=0, alpha=255, norm_type=cv2.NORM_MINMAX);
         filteredImg = np.uint8(filteredImg)
-
+        cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\depthmap.png', filteredImg)
 
         return filteredImg
 
@@ -1155,14 +1192,52 @@ class StereoRectify():
 # cali = Calibration("circle")
 # cali.method_manager()
 
-# cam_5 = Camera(5)
-# path, path_l, path_r = cam_5.get_dir()
-# print('paths:', path, path_l, path_r)
-# read_all = PhotoSet(path, path_l, path_r)
-# imma1, imma2 = read_all.image_to_matrix()
-# chacal = CameraCalibration("charuco", imma1, imma2)
-# camera5 = chacal.method_manager(5, 5, 0.15)
-# print('camera5:', camera5)
+cam_5 = Camera(5)
+path, path_l, path_r = cam_5.get_dir
+print('paths:', path, path_l, path_r)
+read_all = PhotoSet(path, path_l, path_r)
+imma1, imma2 = read_all.image_to_matrix
+chacal = CameraCalibration("charuco", imma1, imma2, path)
+camera5 = chacal.method_manager(5, 5, 0.15)
+print('camera5:', camera5)
+
+# camera5 = {'rms': 0.3340139547504995, 'M1': np.array([[8.11194256e+03, 0.00000000e+00, 1.50573679e+03],
+#        [0.00000000e+00, 8.11337077e+03, 2.26124973e+03],
+#        [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), 'M2': np.array([[8.11194256e+03, 0.00000000e+00, 1.50573679e+03],
+#        [0.00000000e+00, 8.11337077e+03, 2.26124973e+03],
+#        [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), 'dist1': np.array([[-1.99060644e+00,  8.17715084e+01,  1.76126084e-03,
+#         -8.81308791e-04, -1.21146285e+01, -1.95354945e+00,
+#          8.25324858e+01, -1.29870567e+01,  0.00000000e+00,
+#          0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+#          0.00000000e+00,  0.00000000e+00]]), 'dist2': np.array([[-1.32890753e+01,  2.99335988e+02,  2.10385460e-03,
+#         -8.33790090e-04,  2.27295026e+02, -1.32241701e+01,
+#          2.98734234e+02,  2.49206056e+02,  0.00000000e+00,
+#          0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+#          0.00000000e+00,  0.00000000e+00]]), 'R': np.array([[ 0.98520661,  0.00321211,  0.17134065],
+#        [ 0.00391106,  0.99914246, -0.0412194 ],
+#        [-0.17132612,  0.04127975,  0.9843492 ]]), 'T': np.array([[-1.50150311],
+#        [-0.09902166],
+#        [ 0.08425395]]), 'E': np.array([[ 0.01663547, -0.08826928, -0.09399899],
+#        [-0.17423916,  0.06225231,  1.49243951],
+#        [ 0.09168432, -1.49989745,  0.0788575 ]]), 'F': np.array([[ 4.77968876e-09, -2.53613720e-08, -1.72314760e-04],
+#        [-5.00534199e-08,  1.78830731e-08,  3.52631002e-03],
+#        [ 3.19676412e-04, -3.49807466e-03,  1.00000000e+00]]), 'dims': (3072, 4096)}
+
+# 这组数据是目前最准的 极线齐的不像话
+# camera5 = {'rms': 0.3340139547504995, 'M1': np.array([[8.22169440e+03, 0.00000000e+00, 1.50206854e+03],
+#        [0.00000000e+00, 8.24432071e+03, 2.46090682e+03],
+#        [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), 'M2': np.array([[8.22169440e+03, 0.00000000e+00, 1.50206854e+03],
+#        [0.00000000e+00, 8.24432071e+03, 2.46090682e+03],
+#        [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), 'dist1': np.array([[-8.49267507e-02, -3.19915593e-02,  4.18965592e-03,  8.06757093e-05,
+#    0.00000000e+00]]), 'dist2': np.array([[-0.04726039, -0.196313,    0.0101606,   0.00119035,  0.        ]]), 'R': np.array([[ 0.98625401, -0.00168698,  0.16522768],
+#  [ 0.00901614,  0.9990076,  -0.04361798],
+#  [-0.16499012,  0.04450812,  0.98529046]]), 'T': np.array([[-1.52199684],
+#  [ 0.03340957],
+#  [ 0.11968841]]), 'E': np.array([[-0.00659138, -0.11808263,  0.0381387 ],
+#        [-0.13307127,  0.06753931,  1.5193848 ],
+#        [-0.04667286, -1.52043004,  0.06086624]]), 'F': np.array([[-1.77814094e-09, -3.17674641e-08,  1.65437316e-04],
+#        [-3.57998176e-08,  1.81200583e-08,  3.36985007e-03],
+#        [-1.27470717e-05, -3.35985487e-03,  1.00000000e+00]]), 'dims': (3072, 4096)}
 
 
 # 下面的测试程序是可用的
@@ -1174,24 +1249,24 @@ class StereoRectify():
 # camera1 = circlecal.method_manager(7, 7, 0.1)
 # print(camera1)
 # # Kreispunkte(33 Paare)
-camera1 = {'rms':0.6160846063201201,
-           'M1':np.array([[8.63936278e+03, 0.00000000e+00, 2.14338706e+03],
-                          [0.00000000e+00, 8.66314910e+03, 1.37603525e+03],
-                          [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
-           'M2': np.array([[8.55432393e+03, 0.00000000e+00, 2.22009028e+03],
-                           [0.00000000e+00, 8.57157453e+03, 1.62701783e+03],
-                           [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
-           'dist1': np.array([[1.08458092e-03, -1.46765523e+00, -4.31746568e-03, 8.08144707e-04, 1.26288403e+01]]),
-           'dist2': np.array([[-4.01207645e-02, -4.86349653e-01, 3.39117551e-03, -9.56593330e-05, 4.24637107e+00]]),
-           'R': np.array([[0.99943117, -0.00303017, -0.03358791],
-                          [-0.00371039, 0.98002908, -0.19881962],
-                          [0.03351959, 0.19883115, 0.97946037]]),
-           'T': np.array([[-0.11844889], [1.6333303], [0.04970491]]),
-           'E': np.array([[0.05493298, 0.27604469, 1.6096646], [0.05364699, 0.02340072, 0.11434651],[-1.63196172, -0.11113409, 0.07841012]]),
-           'F': np.array([[9.33392036e-09, 4.67752622e-08, 2.27854392e-03],
-                          [9.09706623e-09, 3.95722786e-09, 1.42573854e-04],
-                          [-2.40758814e-03, -2.71374248e-04, 1.00000000e+00]]),
-           'dims': (4096, 3072)}
+# camera1 = {'rms':0.6160846063201201,
+#            'M1':np.array([[8.63936278e+03, 0.00000000e+00, 2.14338706e+03],
+#                           [0.00000000e+00, 8.66314910e+03, 1.37603525e+03],
+#                           [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
+#            'M2': np.array([[8.55432393e+03, 0.00000000e+00, 2.22009028e+03],
+#                            [0.00000000e+00, 8.57157453e+03, 1.62701783e+03],
+#                            [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
+#            'dist1': np.array([[1.08458092e-03, -1.46765523e+00, -4.31746568e-03, 8.08144707e-04, 1.26288403e+01]]),
+#            'dist2': np.array([[-4.01207645e-02, -4.86349653e-01, 3.39117551e-03, -9.56593330e-05, 4.24637107e+00]]),
+#            'R': np.array([[0.99943117, -0.00303017, -0.03358791],
+#                           [-0.00371039, 0.98002908, -0.19881962],
+#                           [0.03351959, 0.19883115, 0.97946037]]),
+#            'T': np.array([[-0.11844889], [1.6333303], [0.04970491]]),
+#            'E': np.array([[0.05493298, 0.27604469, 1.6096646], [0.05364699, 0.02340072, 0.11434651],[-1.63196172, -0.11113409, 0.07841012]]),
+#            'F': np.array([[9.33392036e-09, 4.67752622e-08, 2.27854392e-03],
+#                           [9.09706623e-09, 3.95722786e-09, 1.42573854e-04],
+#                           [-2.40758814e-03, -2.71374248e-04, 1.00000000e+00]]),
+#            'dims': (4096, 3072)}
 
 # # CHARUCO 41 Paare
 # camera1 =  {'rms': 0.6321732817249623,
@@ -1220,33 +1295,95 @@ camera1 = {'rms':0.6160846063201201,
 #                            [-2.40352056e-03, -3.95498761e-04,  1.00000000e+00]]), 'dims': (4096, 3072)}
 
 # # CHARUCO 27 Paare
-# camera1 =  {'rms': 0.23029411670690533,
-#             'M1': np.array([[7.76926961e+03, 0.00000000e+00, 2.18344842e+03],
-#                             [0.00000000e+00, 7.77186856e+03, 1.47653162e+03],
-#                             [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
-#             'M2': np.array([[7.78745513e+03, 0.00000000e+00, 2.12119110e+03],
-#                             [0.00000000e+00, 7.78760033e+03, 1.58820078e+03],
-#                             [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
-#             'dist1': np.array([[ 2.15411484e+01, -7.52984445e-01, -4.77100616e-04,
-#                                 -1.11004567e-03,  6.28611368e+01,  2.16371640e+01,
-#                                  2.20579706e+00,  5.95536409e+01,  0.00000000e+00,
-#                                  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-#                                  0.00000000e+00,  0.00000000e+00]]),
-#             'dist2': np.array([[-8.21074720e+00, -7.73014559e+01,  3.25460836e-03,
-#                                  4.04255109e-06, -7.28655606e+00, -8.11190274e+00,
-#                                 -7.80827618e+01, -1.51635306e+01,  0.00000000e+00,
-#                                  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-#                                  0.00000000e+00,  0.00000000e+00]]),
-#             'R': np.array([[ 0.99921903, -0.00389242,  0.03932152],
-#                            [-0.00215945,  0.98826975,  0.15270309],
-#                            [-0.03945466, -0.15266875,  0.98748954]]),
-#             'T': np.array([[ 0.09087192], [-1.45123094], [ 0.14659083]]),
-#             'E': np.array([[ 0.05757437,  0.07668633, -1.45546024],
-#                            [ 0.15006167,  0.01330271, -0.0839709 ],
-#                            [ 1.44990134,  0.08415718,  0.07094103]]),
-#             'F': np.array([[ 1.21159856e-08,  1.61325201e-08, -2.42990829e-03],
-#                            [ 3.15784784e-08,  2.79844190e-09, -2.10369283e-04],
-#                            [ 2.30024029e-03,  9.92057380e-05,  1.00000000e+00]]), 'dims': (4096, 3072)}
+camera1 =  {'rms': 0.23029411670690533,
+            'M1': np.array([[7.76926961e+03, 0.00000000e+00, 2.18344842e+03],
+                            [0.00000000e+00, 7.77186856e+03, 1.47653162e+03],
+                            [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
+            'M2': np.array([[7.78745513e+03, 0.00000000e+00, 2.12119110e+03],
+                            [0.00000000e+00, 7.78760033e+03, 1.58820078e+03],
+                            [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
+            'dist1': np.array([[ 2.15411484e+01, -7.52984445e-01, -4.77100616e-04,
+                                -1.11004567e-03,  6.28611368e+01,  2.16371640e+01,
+                                 2.20579706e+00,  5.95536409e+01,  0.00000000e+00,
+                                 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+                                 0.00000000e+00,  0.00000000e+00]]),
+            'dist2': np.array([[-8.21074720e+00, -7.73014559e+01,  3.25460836e-03,
+                                 4.04255109e-06, -7.28655606e+00, -8.11190274e+00,
+                                -7.80827618e+01, -1.51635306e+01,  0.00000000e+00,
+                                 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+                                 0.00000000e+00,  0.00000000e+00]]),
+            'R': np.array([[ 0.99921903, -0.00389242,  0.03932152],
+                           [-0.00215945,  0.98826975,  0.15270309],
+                           [-0.03945466, -0.15266875,  0.98748954]]),
+            'T': np.array([[ 0.09087192], [-1.45123094], [ 0.14659083]]),
+            'E': np.array([[ 0.05757437,  0.07668633, -1.45546024],
+                           [ 0.15006167,  0.01330271, -0.0839709 ],
+                           [ 1.44990134,  0.08415718,  0.07094103]]),
+            'F': np.array([[ 1.21159856e-08,  1.61325201e-08, -2.42990829e-03],
+                           [ 3.15784784e-08,  2.79844190e-09, -2.10369283e-04],
+                           [ 2.30024029e-03,  9.92057380e-05,  1.00000000e+00]]), 'dims': (4096, 3072)}
+
+# Charuco camera pair 2
+camera7 = {'rms': 0.6001401637562398,
+           'M1': np.array([[8.15066773e+03, 0.00000000e+00, 2.27520316e+03],
+                       [0.00000000e+00, 8.15066773e+03, 1.41852113e+03],
+                       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
+           'M2': np.array([[8.25986570e+03, 0.00000000e+00, 2.34313795e+03],
+                       [0.00000000e+00, 8.25986570e+03, 1.52131470e+03],
+                       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
+           'dist1': np.array([[-6.44207147e-02, -2.11755525e+00, -1.21034426e-03, 2.50408304e-03,  2.63932819e+01]]),
+           'dist2': np.array([[-0.10662915,  0.04702318, -0.00432018,  0.00430638, -0.4923346 ]]),
+           'R': np.array([[ 0.99985754,  0.01520622, -0.00732576],
+                       [-0.01640778,  0.97745836, -0.21048977],
+                       [ 0.00395987,  0.21057999,  0.97756861]]),
+           'T': np.array([[0.02664127],
+                       [1.47886014],
+                       [0.02899261]]),
+           'E': np.array([[ 0.00961336,  0.0875876 ,  1.49388785],
+                       [ 0.22885449, -0.00212801, -0.02772121],
+                       [-1.47908659,  0.00355286,  0.00522606]]),
+           'F': np.array([[ 9.15849137e-09,  8.34432770e-08,  1.14608474e-02],
+                       [ 2.18025935e-07, -2.02731674e-09, -7.08432920e-04],
+                       [-1.19921357e-02, -1.64477318e-04,  1.00000000e+00]]),
+           'dims': (4096, 3072)}
+camera4 = {'rms': 0.6001401637562398,
+           'M1': np.array([[8.15066773e+03, 0.00000000e+00, 2.27520316e+03],
+                       [0.00000000e+00, 8.15066773e+03, 1.41852113e+03],
+                       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
+           'M2': np.array([[8.25986570e+03, 0.00000000e+00, 2.34313795e+03],
+                       [0.00000000e+00, 8.25986570e+03, 1.52131470e+03],
+                       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]),
+           'dist1': np.array([[-6.44207147e-02, -2.11755525e+00, -1.21034426e-03,
+                            2.50408304e-03,  2.63932819e+01]]),
+           'dist2': np.array([[-0.10662915,  0.04702318, -0.00432018,  0.00430638, -0.4923346 ]]),
+           'R': np.array([[ 0.99985754,  0.01520622, -0.00732576],
+                       [-0.01640778,  0.97745836, -0.21048977],
+                       [ 0.00395987,  0.21057999,  0.97756861]]),
+           'T': np.array([[0.02664127],
+                       [1.47886014],
+                       [0.22899261]]),
+           'E': np.array([[ 0.00961336,  0.0875876 ,  1.49388785],
+                       [ 0.22885449, -0.00212801, -0.02772121],
+                       [-1.47908659,  0.00355286,  0.00522606]]),
+           'F': np.array([[ 9.15849137e-09,  8.34432770e-08,  1.14608474e-02],
+                       [ 2.18025935e-07, -2.02731674e-09, -7.08432920e-04],
+                       [-1.19921357e-02, -1.64477318e-04,  1.00000000e+00]]),
+           'dims': (4096, 3072)}
+
+# camera5 = {'rms': 0.6184895242917753, 'M1': np.array([[8.27834552e+03, 0.00000000e+00, 1.54767841e+03],
+#        [0.00000000e+00, 8.28051220e+03, 1.79568282e+03],
+#        [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), 'M2': np.array([[8.27834552e+03, 0.00000000e+00, 1.54767841e+03],
+#        [0.00000000e+00, 8.28051220e+03, 1.79568282e+03],
+#        [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), 'dist1': np.array([[-0.13254596,  0.35538618, -0.00261707, -0.00201904,  0.        ]]), 'dist2': np.array([[-0.06980564, -0.22430307, -0.00541761, -0.00367005,  0.        ]]), 'R': np.array([[ 0.98021208,  0.0169093 , -0.19722667],
+#        [-0.01758684,  0.99984392, -0.00168424],
+#        [ 0.19716741,  0.00511951,  0.98035647]]), 'T': np.array([[ 1.49422874],
+#        [-0.02040696],
+#        [ 0.1239421 ]]), 'E': np.array([[-0.00184384, -0.12402722, -0.01979735],
+#        [-0.17312367, -0.00555394, -1.48932149],
+#        [-0.00627561,  1.49434059, -0.00654144]]), 'F': np.array([[ 1.77847340e-09,  1.19599160e-07, -5.94352578e-05],
+#        [ 1.66942745e-07,  5.35424881e-09,  1.16209512e-02],
+#        [-2.52418703e-04, -1.21237214e-02,  1.00000000e+00]]), 'dims': (3072, 4096)}
+
 
 def preprocess(img1, img2):
     # 彩色图->灰度图
@@ -1261,23 +1398,37 @@ def preprocess(img1, img2):
 
     return img1, img2
 
-# path = 'C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder'
-# stereo1 = StereoRectify(camera1)
-# rectify_model = stereo1.get_rectify_transform(path)
-# print(rectify_model)
-# imgl = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\22-02-25_12-45-24_1.jpg', 0)
-# imgr = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\22-02-25_12-45-24_2.jpg', 0)
-# imgl = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\22-03-17_13-14-27_1.jpg', 0)
-# imgr = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\22-03-17_13-14-27_2.jpg', 0)
-# imgl = cv2.imread('C:\\Users\\wyfmi\\Downloads\\opencv-4.5.5\\opencv-4.5.5\\samples\\data\\aloeL.jpg', 0)
-# imgr = cv2.imread('C:\\Users\\wyfmi\\Downloads\\opencv-4.5.5\\opencv-4.5.5\\samples\\data\\aloeR.jpg', 0)
+# path = 'C:\\Users\\wyfmi\\Desktop\\0422'
+stereo5 = StereoRectify(camera5)
+rectify_model = stereo5.get_rectify_transform()
+#
+print(rectify_model)
+# # imgl = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\22-02-25_12-45-24_1.jpg', 0)
+# # imgr = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\22-02-25_12-45-24_2.jpg', 0)
+# imgl = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\22-04-21_15-19-321.png', -1)
+# imgr = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\22-04-21_15-19-322.png', -1)
+# imgl = cv2.imread('C:\\Users\\wyfmi\\Downloads\\opencv-4.5.5\\opencv-4.5.5\\samples\\data\\aloeL.jpg')
+# imgr = cv2.imread('C:\\Users\\wyfmi\\Downloads\\opencv-4.5.5\\opencv-4.5.5\\samples\\data\\aloeR.jpg')
+
+imgl = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\22-04-21_15-20-441 - Kopie.png')
+# imgl = np.rot90(imgl)
+imgr = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\22-04-21_15-20-442 - Kopie.png')
+# imgr = np.rot90(imgr)
+# imgl = cv2.cvtColor(imgl, cv2.COLOR_BGR2GRAY)
+# imgr = cv2.cvtColor(imgr, cv2.COLOR_BGR2GRAY)
 # iml_, imr_ = preprocess(imgl, imgr)
-# stereo1.rectify_image(imgl, imgr)
-# imgl = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\result1.png')
-# imgr = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\result2.png')
-imgl = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\result1.png')
-imgr = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\result2.png')
-iml_, imr_ = preprocess(imgl, imgr)
+stereo5.rectify_image(imgl, imgr)
+
+# # imgl = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\result1.png')
+# # imgr = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\result2.png')
+imgl = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\result1.png')
+imgr = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\result2.png')
+stereo5.draw_line(imgl, imgr)
+# imgl = cv2.cvtColor(imgl, cv2.COLOR_BGR2GRAY)
+# imgr = cv2.cvtColor(imgr, cv2.COLOR_BGR2GRAY)
+# iml_, imr_ = preprocess(imgl, imgr)
+stereo5.stereo_matchSGBM(imgl, imgr)
+# stereo5.depth_map(imgl, imgr)
 
 
 def stereo_matchSGBM(left_image, right_image, down_scale=False):
@@ -1300,24 +1451,27 @@ def stereo_matchSGBM(left_image, right_image, down_scale=False):
     # blockSize = [3, 5, 7, 15]
     # uniquenessRatui = [5, 10, 15]
     #
-    blockSize = 9  # 3
-    paraml = {'minDisparity': 150,
-              'numDisparities': 20 * 16,  # 128
-              'blockSize': blockSize,
-              'P1': 8 * img_channels * blockSize ** 2,  # 8
-              'P2': 32 * img_channels * blockSize ** 2,  # 32
-              'disp12MaxDiff': -1,  # 1 # non-positive vaalue to disable the check
-              'preFilterCap': 31,
-              'uniquenessRatio': 15,  # 15 don't set too large.
-              'speckleWindowSize': 0,
-              # 100  Set it to 0 to disable speckle filtering. Otherwise, set it somewhere in the 50-200 range
-              'speckleRange': 2,  # 7
-              'mode': cv2.STEREO_SGBM_MODE_SGBM_3WAY
-              }
+    blockSize = 15  # 3
+    paraml = cv2.StereoSGBM_create(
+        minDisparity=-64,
+        numDisparities=15 * 16,  # max_disp has to be dividable by 16 f. E. HH 192, 256
+        blockSize=9,
+        # P1=8 * img_channels * blockSize ** 2,
+        P1=100,
+        # wsize default 3; 5; 7 for SGBM reduced size image; 15 for SGBM full size image (1300px and above); 5 Works nicely
+        # P2=32 * img_channels * blockSize ** 2,
+        P2=1000,
+        disp12MaxDiff=-1,
+        uniquenessRatio=15,
+        speckleWindowSize=100,
+        speckleRange=32,
+        preFilterCap=63,
+        mode=cv2.STEREO_SGBM_MODE_SGBM_3WAY
+    )
 
     # cread the SGBM instance
-    left_matcher = cv2.StereoSGBM_create(**paraml)
-    paramr = paraml
+    left_matcher = cv2.StereoSGBM_create(matcher_left=left_matcher)
+    # paramr = paraml
     paramr['minDisparity'] = -paraml['numDisparities']
     # paramr['minDisparity'] = -15*16
     right_matcher = cv2.StereoSGBM_create(**paramr)
@@ -1325,7 +1479,7 @@ def stereo_matchSGBM(left_image, right_image, down_scale=False):
     # Filter Parameters
     lmbda = 80000
     # sigma = [0.7, 1.2, 1.5]
-    sigma = 1.0
+    sigma = 1.3
     visual_multiplier = 1.0  # 1.0
 
     # wsl filter are used to smooth the depthmap
@@ -1366,46 +1520,52 @@ def stereo_matchBM(left_image, right_image, down_scale=False):
     else:
         img_channels = 3
 
-    numDisparities = 15 * 16
+
+    num = 5
     blockSize = 15
+    units = 0.001
+    fx = 0
+    baseline = 0
 
     paraml = {'minDisparity' : 0,
-              'numDisparities' : 64,
+              'numDisparities' : num * 16,
               'blockSize' : 9  # 3
               }
 
     # cread the SGBM instance
     left_matcher = cv2.StereoBM_create(numDisparities, blockSize)
-    paramr = paraml
-    paramr['minDisparity'] = -paraml['numDisparities']
+    # paramr = paraml
+    # paramr['minDisparity'] = -paraml['numDisparities']
     # paramr['minDisparity'] = -15*16
     # right_matcher = cv2.StereoBM_create(-numDisparities, blockSize)
 
     # Filter Parameters
-    lmbda = 100000
+    # lmbda = 100000
     # sigma = [0.7, 1.2, 1.5]
-    sigma = 1.3
-    visual_multiplier = 1.0  # 1.0
+    # sigma = 1.3
+    # visual_multiplier = 1.0  # 1.0
     #
     # wsl filter are used to smooth the depthmap
-    wls_filter = cv2.ximgproc.createDisparityWLSFilter(matcher_left=left_matcher)
-    wls_filter.setLambda(lmbda)
-    wls_filter.setSigmaColor(sigma)
+    # wls_filter = cv2.ximgproc.createDisparityWLSFilter(matcher_left=left_matcher)
+    # wls_filter.setLambda(lmbda)
+    # wls_filter.setSigmaColor(sigma)
 
     # calculate the disparity map
     print('computing disparity...')
     displ = left_matcher.compute(left_image, right_image)  # .astype(np.float32)/16
     # dispr = right_matcher.compute(right_image, left_image)  # .astype(np.float32)/16
-    displ = np.int16(displ)
+    depth = np.zeros(shape=left.shape).astype(float)
+    depth[disparity > 0] = (fx * baseline) / (units * disparity[disparity > 0])
+    # displ = np.int16(displ)
     # dispr = np.int16(dispr)
     # filteredImg = wls_filter.filter(displ, left_image, None, dispr)  # important to put "imgL" here!!!
 
-    filteredImg = cv2.normalize(src=displ, dst=displ, beta=0, alpha=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U);
-    filteredImg = np.uint8(filteredImg)
-    cv2.imshow('Disparity Map', filteredImg)
-    cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\depthmap.png', filteredImg)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    # filteredImg = cv2.normalize(src=displ, dst=displ, beta=0, alpha=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U);
+    # filteredImg = np.uint8(filteredImg)
+    # cv2.imshow('Disparity Map', filteredImg)
+    # cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\depthmap.png', filteredImg)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
 
 
 def stereo_match(imgL, imgR):
@@ -1459,9 +1619,14 @@ def stereo_match(imgL, imgR):
 # #
 #
 # stereo1.draw_line(imgl, imgr)
+# imgl = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\result1.png')
+# imgr = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\result2.png')
+# imgl = cv2.imread('C:\\Users\\wyfmi\\Downloads\\opencv-4.5.5\\opencv-4.5.5\\samples\\data\\aloeL.jpg')
+# imgr = cv2.imread('C:\\Users\\wyfmi\\Downloads\\opencv-4.5.5\\opencv-4.5.5\\samples\\data\\aloeR.jpg')
 # stereo_matchSGBM(imgl, imgr)
+
 # # depth_img = stereo3.depth_map(imgl, imgr)
-stereo_matchSGBM(iml_, imr_)
+# stereo_matchSGBM(iml_, imr_)
 # d = stereo_match(iml_, imr_)
 # disp = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\depthmap.png', 0)
 # disp, _ = stereo3.stereoMatchSGBM(imgl, imgr)
@@ -1584,3 +1749,6 @@ def view_cloud(pointcloud):
 # square = CameraCalibration("circle", imma1, imma2, path)
 # camera1 = square.method_manager(7, 7, 0.1)
 # print('camera1:', camera1)
+
+# cml = np.array([[],[],[]])
+# cmr = np.array([[],[],[]])
