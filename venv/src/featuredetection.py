@@ -8,19 +8,14 @@ date  : 13.04.2022
 import cv2
 import numpy as np
 import open3d as o3d
+from src.charuco_points import cha_l, cha_r
 
-feature_params = {'maxCorners' : 1000,
-                  'quality_level' : 0.3,
-                  'minDistance' : 7,
-                  'blockSize' : 7}
-
-lk_params = {'winSize' : (15,5),
-             'maxLevel' : 2,
-             'criteria' : (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03)}
+feature_params = {'maxCorners': 1000,
+                  'quality_level': 0.3,
+                  'minDistance': 7,
+                  'blockSize': 7}
 
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-
-
 
 def feature_detect(imgl, imgr, repro_l, repro_r, disparity, Q):
 
@@ -76,6 +71,7 @@ def save_txt(points, save_path):
         filename.write('\n')
     filename.close()
 
+
 def draw_line(image1, image2):
     '''
 
@@ -91,183 +87,172 @@ def draw_line(image1, image2):
     height = max(image1.shape[0], image2.shape[0])
     width = image1.shape[1] + image2.shape[1]
 
-    output = np.zeros((height, width), dtype=np.uint8)
+    output = np.zeros((height, width, 3), dtype=np.uint8)
     output[0:image1.shape[0], 0:image1.shape[1]] = image1
     output[0:image2.shape[0], image1.shape[1]:] = image2
 
     # 绘制等间距平行线
     line_interval = 50  # 直线间隔：50
     for k in range(height // line_interval):
-        cv2.line(output, (0, line_interval * (k + 1)), (2 * width, line_interval * (k + 1)), (0, 255, 0),
+        cv2.line(output, (0, line_interval * (2 * k)), (2 * width, line_interval * (2 * k)), (0, 255, 0),
+                 thickness=2, lineType=cv2.LINE_AA)
+        cv2.line(output, (0, line_interval * (2 * k + 1)), (2 * width, line_interval * (2 * k + 1)), (0, 0, 255),
                  thickness=2, lineType=cv2.LINE_AA)
     cv2.imshow("withlines", output)
     # cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-02-25_Kallibrierbilder\\withlines.png', output)
-    cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\withlines.png', output)
-    cv2.waitKey(80000)
-
-def hw3ToN3(points):
-    height, width = points.shape[0:2]
-
-    points_1 = points[:, :, 0].reshape(height * width, 1)
-    points_2 = points[:, :, 1].reshape(height * width, 1)
-    points_3 = points[:, :, 2].reshape(height * width, 1)
-
-    points_ = np.hstack((points_1, points_2, points_3))
-
-    return points_
+    cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\withlines.png', output)
+    cv2.waitKey(8000)
 
 
-# 深度、颜色转换为点云
-def DepthColor2Cloud(points_3d, colors):
-    rows, cols = points_3d.shape[0:2]
-    print('rows, cols:', rows, cols)
-    size = rows * cols
+def stereo_matchSGBM(left_image, right_image, down_scale=False):
+    '''
+    Calculate the depthmap use SGBM algorithm
+    Parameters
+    ----------
+    left_image: the rectified left image
+    right_image: the rectified right image
+    down_scale:
 
-    points_ = hw3ToN3(points_3d)
-    colors_ = hw3ToN3(colors).astype(np.int64)
+    Returns
+    -------
+    Depthmap
+    '''
+    if left_image.ndim == 2:
+        img_channels = 1
+    else:
+        img_channels = 3
+    # blockSize = [3, 5, 7, 15]
+    # uniquenessRatui = [5, 10, 15]
+    #
+    blockSize = 3  # 3
+    paraml = {'minDisparity': -64,
+              'numDisparities': 10 * 16,  # 128
+              'blockSize': blockSize,
+              # 'P1': 8 * img_channels * blockSize ** 2,  # 8
+              'P1': 100,
+              # 'P2': 32 * img_channels * blockSize ** 2,  # 32
+              'P2': 1000,
+              'disp12MaxDiff': 2,  # 1 # non-positive vaalue to disable the check
+              'preFilterCap': 31,
+              'uniquenessRatio': 15,  # 15 don't set too large.
+              'speckleWindowSize': 100,
+              # 100  Set it to 0 to disable speckle filtering. Otherwise, set it somewhere in the 50-200 range
+              'speckleRange': 2,  # 7
+              'mode': cv2.STEREO_SGBM_MODE_SGBM_3WAY
+              }
 
-    # 颜色信息
-    blue = colors_[:, 0].reshape(size, 1)
-    green = colors_[:, 1].reshape(size, 1)
-    red = colors_[:, 2].reshape(size, 1)
+    # cread the SGBM instance
+    left_matcher = cv2.StereoSGBM_create(**paraml)
+    # paramr = paraml
+    # paramr['minDisparity'] = -paraml['numDisparities']
+    # paramr['minDisparity'] = -15*16
+    right_matcher = cv2.ximgproc.createRightMatcher(left_matcher)
 
-    rgb = np.left_shift(blue, 0) + np.left_shift(green, 8) + np.left_shift(red, 16)
+    # Filter Parameters
+    lmbda = 80000
+    # sigma = [0.7, 1.2, 1.5]
+    sigma = 1.2
+    visual_multiplier = 1.0  # 1.0
 
-    # 将坐标+颜色叠加为点云数组
-    pointcloud = np.hstack((points_, rgb)).astype(np.float32)
+    # wsl filter are used to smooth the depthmap
+    wls_filter = cv2.ximgproc.createDisparityWLSFilter(matcher_left=left_matcher)
+    wls_filter.setLambda(lmbda)
+    wls_filter.setSigmaColor(sigma)
 
-    # 删掉一些不合适的点
-    X = pointcloud[:, 0]
-    Y = -pointcloud[:, 1]
-    Z = -pointcloud[:, 2]
+    # calculate the disparity map
+    print('computing disparity...')
+    displ = left_matcher.compute(left_image, right_image)  #.astype(np.float32)/16
+    dispr = right_matcher.compute(right_image, left_image)  #.astype(np.float32)/16
+    displ = np.int16(displ)
+    dispr = np.int16(dispr)
+    filteredImg = wls_filter.filter(displ, left_image, None, dispr)  # important to put "imgL" here!!!
 
-    remove_idx1 = np.where(Z <= 0)
-    remove_idx2 = np.where(Z > 15000)
-    remove_idx3 = np.where(X > 10000)
-    remove_idx4 = np.where(X < -10000)
-    remove_idx5 = np.where(Y > 10000)
-    remove_idx6 = np.where(Y < -10000)
-    remove_idx = np.hstack((remove_idx1[0], remove_idx2[0], remove_idx3[0], remove_idx4[0], remove_idx5[0], remove_idx6[0]))
-
-    pointcloud_1 = np.delete(pointcloud, remove_idx, 0)
-
-    return pointcloud_1
+    filteredImg = cv2.normalize(src=filteredImg, dst=filteredImg, beta=0, alpha=255, norm_type=cv2.NORM_MINMAX);
+    filteredImg = np.uint8(filteredImg)
+    cv2.imshow('Disparity Map', filteredImg)
+    cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\depthmap.png', filteredImg)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
 
 
 
-# img1 = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\22-03-17_13-15-54_1.jpg', 0)
-# img2 = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\22-03-17_13-15-54_2.jpg', 0)
-img1 = cv2.imread('C:\\Users\\wyfmi\\Downloads\\opencv-4.5.5\\opencv-4.5.5\\samples\\data\\left01.jpg')
-img2 = cv2.imread('C:\\Users\\wyfmi\\Downloads\\opencv-4.5.5\\opencv-4.5.5\\samples\\data\\right01.jpg')
-img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
-img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+img1 = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\22-04-21_15-07-572_1.png', -1)
+# img1 = np.rot90(img1)
+img2 = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\22-04-21_15-07-571_1.png', -1)
+# img2 = np.rot90(img2)
 rows, cols, channels = img1.shape
 gray1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
 gray2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
 
-dst1 = cv2.goodFeaturesToTrack(gray1, 100, 0.01, 30)
-# dst2 = cv2.goodFeaturesToTrack(gray2, 500, 0.01, 30)
-dst1 = np.int0(dst1)  # 实际上也是np.int64
-# dst2 = np.int0(dst2)
-for i in dst1:
+dst1 = cv2.goodFeaturesToTrack(gray1, 500, 0.01, 50, 7)
+
+exact_corners = cv2.cornerSubPix(gray1, dst1, (11, 11), (1, 1),
+                                 criteria=(cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001))
+lk_params = {'winSize': (15, 15),
+             'maxLevel': 9,
+             'criteria': (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 100, 0.03)}
+
+features, ret, err = cv2.calcOpticalFlowPyrLK(gray1, gray2, dst1, None, **lk_params)
+
+# bb is the points can't find in image 2. There points will be deleted before stereoRectifyUncalibrated
+bb = np.where(ret == 0)
+print(bb[0])
+
+dst1_new = np.delete(dst1, bb, axis=0)
+print('points:', dst1_new.shape[0])
+features_new = np.delete(features, bb, axis=0)
+print('targets:', features_new.shape[0])
+dst1_new = np.int0(dst1_new)  # 实际上也是np.int64
+for i in dst1_new:
     x, y = i.ravel()  # 数组降维成一维数组（inplace的方式）
-    cv2.circle(img1, (x, y), 3, (0, 0, 255), -1)
-# for i in dst2:
-#     x, y = i.ravel()  # 数组降维成一维数组（inplace的方式）
-#     cv2.circle(img2, (x, y), 3, (0, 255, 0), -1)
+    cv2.circle(img1, (x, y), 7, (0, 0, 255), -1)
 
-dst1 = np.float32(dst1)  # 实际上也是np.int64
-# dst2 = np.float32(dst2)
-
+dst1_new = np.float32(dst1_new)  # 实际上也是np.int64
+print()
 
 cv2.namedWindow('harris', cv2.WINDOW_FREERATIO)
 cv2.imshow('harris', img1)
 cv2.waitKey(0)
-# cv2.namedWindow('harris2', cv2.WINDOW_FREERATIO)
-# cv2.imshow('harris2', img2)
-# cv2.waitKey(0)
 
-exact_corners = cv2.cornerSubPix(gray1, dst1, (11, 11), (1, 1),
-                                 criteria=(cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001))
+features_new = np.int0(features_new)
+for i in features_new:
+    x, y = i.ravel()  # 数组降维成一维数组（inplace的方式）
+    cv2.circle(img2, (x, y), 7, (0, 255, 0), -1)
+features_new = np.float32(features_new)
 
-features, ret, err = cv2.calcOpticalFlowPyrLK(gray1, gray2, dst1, None, **lk_params)
-features = np.float32(features)
+cv2.namedWindow('harris2', cv2.WINDOW_FREERATIO)
+cv2.imshow('harris2', img2)
+cv2.waitKey(0)
+
+print(dst1.shape[0])
 
 # eg
-F, mask = cv2.findFundamentalMat(dst1, features, method=cv2.FM_RANSAC, ransacReprojThreshold=0.9, confidence=0.99)
-ret_sr, H1, H2 = cv2.stereoRectifyUncalibrated(dst1, features, F, (rows, cols))
+F, mask = cv2.findFundamentalMat(dst1_new, features_new, method=cv2.FM_RANSAC, ransacReprojThreshold=0.9, confidence=0.99)
+ret_sr, H1, H2 = cv2.stereoRectifyUncalibrated(dst1_new, features_new, F, (cols, rows))
 print('H1', H1)
 print('H2', H2)
-# print(type(dst1))
-# print(type(dst2))
-# dst1 = np.reshape(dst1, (-1, 2))
-# features = np.reshape(features, (-1, 2))
-# get1 = dst1[0:4, :, :]
-# get2 = features[0:4, :, :]
-# get1 = np.float32([[1244.3438, 1557.8981], [1383.5292, 1557.9946], [1246.2388, 1420.1682], [1385.0676, 1420.1768]]) # charuco
-# get2 = np.float32([[912.126, 1614.6339], [1052.332, 1613.647], [910.7861, 1474.6659], [1051.0118, 1473.9277]]) # charuco
-get1 = np.float32([[2102.0972, 937.55426], [2033.5266, 1004.94385], [2034.0977, 871.0303], [1965.6803, 938.29767]])
-get2 = np.float32([[1768.7593, 1048.3353], [1699.5786, 1117.5253], [1699.3003, 978.6675], [1630.3837, 1047.9603]])
-K = cv2.getPerspectiveTransform(get1, get2)
-# K = np.array([[0.99943117, -0.00303017, -0.03358791],
-#                           [-0.00371039, 0.98002908, -0.19881962],
-#                           [0.03351959, 0.19883115, 0.97946037]])
-remap1 = cv2.warpPerspective(gray1, K, (cols, rows), flags=None, borderMode=None, borderValue=None)
-remap2 = cv2.warpPerspective(gray2, K, (cols, rows), flags=None, borderMode=None, borderValue=None)
 
-cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\result1.png', remap1)
-cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\result2.png', remap2)
+# K = cv2.getPerspectiveTransform(get1, get2)
 
-Q = np.array([[1, 0, 0, -2.048e+03],
-              [0, 1, 0, -1.536e+03],
-              [0, 0, 0, 7.78e+03],
-              [0, 0, -6.67e-01, 0.2214]])
+remap1 = cv2.warpPerspective(gray1, H1, (cols, rows), flags=None, borderMode=None, borderValue=None)
+remap2 = cv2.warpPerspective(gray2, H2, (cols, rows), flags=None, borderMode=None, borderValue=None)
 
-disparity = cv2.imread('C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder\\depthmap.png', 0)
-points = cv2.reprojectImageTo3D(disparity, Q)
+cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\result1.png', remap1)
+cv2.imwrite('C:\\Users\\wyfmi\\Desktop\\0422\\result2.png', remap2)
 
-# pointcloud = hw3ToN3(points)
+imgl = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\result1.png')
+imgr = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\result2.png')
+draw_line(imgl, imgr)
 
-def onMouse(event, x, y, flags, param):
-    if event == cv2.EVENT_LBUTTONDOWN:
-        print('点 (%d, %d) 的三维坐标 (%f, %f, %f)' % (x, y, points[y, x, 0], points[y, x, 1], points[y, x, 2]))
-        dis = ((points[y, x, 0] ** 2 + points[y, x, 1] ** 2 + points[y, x, 2] ** 2) ** 0.5) / 1000
-        print('点 (%d, %d) 距离左摄像头的相对距离为 %0.3f m' % (x, y, dis))
+stereo_matchSGBM(imgl, imgr)
 
-    # 显示图片
+# Q = np.array([[ 1.00000000e+00,  0.00000000e+00,  0.00000000e+00, -2.32285745e+03],
+#        [ 0.00000000e+00,  1.00000000e+00,  0.00000000e+00, -1.91700760e+03],
+#        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, 6.52395231e+03],
+#        [ 0.00000000e+00,  0.00000000e+00, -6.68127053e-01, 1.14463130e+03]])
+
+disparity = cv2.imread('C:\\Users\\wyfmi\\Desktop\\0422\\depthmap.png', 0)
+# points = cv2.reprojectImageTo3D(disparity, Q)
 
 
-cv2.namedWindow("disparity", 0)
-cv2.imshow("disparity", disparity)
-cv2.setMouseCallback("disparity", onMouse, 0)
 
-
-# pointcloud = DepthColor2Cloud(points, img1)[:, 0:3]
-
-# path = 'C:\\Users\\wyfmi\\Desktop\\2022-03-18_Kalibrierbilder'
-# point_cloud = o3d.geometry.PointCloud()
-# point_cloud.points = o3d.utility.Vector3dVector(pointcloud)
-# point_cloud.colors = o3d.utility.Vector3dVector(colors / 255)
-# o3d.visualization.draw_geometries([point_cloud])
-
-def save_txt(points, save_path):
-    filename = open(save_path + '\\' + 'points.txt', 'w')
-    for k, v in points.items():
-        filename.write(k + ':' + str(v))
-        filename.write('\n')
-    filename.close()
-
-print(points.shape)
-# np.savetxt(path + '\\' + 'points.txt', points)
-
-cv2.namedWindow('reprojection1', cv2.WINDOW_FREERATIO)
-cv2.imshow('reprojection1', remap1)
-cv2.waitKey(0)
-cv2.namedWindow('reprojection2', cv2.WINDOW_FREERATIO)
-cv2.imshow('reprojection2', remap2)
-cv2.waitKey(0)
-
-# result = np.concatenate((rectified_img1, rectified_img2), axis=1)
-# resize = cv2.resize(result, (1024, 384))
-
-draw_line(remap1, remap2)
