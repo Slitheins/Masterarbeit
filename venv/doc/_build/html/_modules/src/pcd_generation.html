@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.pcd_generation &mdash; Masterarbeit 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Masterarbeit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Sequence of code execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about%20main.html">Introduction to the use of mian.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Source code package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Masterarbeit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>src.pcd_generation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.pcd_generation</h1><div class="highlight"><pre>
+<span></span><span class="c1"># !/usr/bin/env python</span>
+<span class="c1"># -*- coding:utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">author: yifeng</span>
+<span class="sd">date  : 27.03.2022</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">open3d</span> <span class="k">as</span> <span class="nn">o3d</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+
+<div class="viewcode-block" id="depth2xyz"><a class="viewcode-back" href="../../src.html#src.pcd_generation.depth2xyz">[docs]</a><span class="k">def</span> <span class="nf">depth2xyz</span><span class="p">(</span><span class="n">disparity</span><span class="p">,</span> <span class="n">cam_matrix</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">depth_scale</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">with_Q</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert the 2D image to 3D point cloud.</span>
+
+<span class="sd">    convert disparity map to 3D point cloud using camera intrinsic parameters and Q matrix..</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    disparity : array</span>
+<span class="sd">        disparity map. The better the disparity map, the more accurate the point cloud is.</span>
+<span class="sd">    cam_matrix : 4 x 4 matrix</span>
+<span class="sd">        intrinsic parameters of the left camera.</span>
+<span class="sd">    Q : 4×4 matrix</span>
+<span class="sd">        disparity-to-depth mapping matrix.</span>
+<span class="sd">    flatten : bool</span>
+<span class="sd">        stack all the points in point cloud together.</span>
+<span class="sd">    with_Q : bool</span>
+<span class="sd">        if the OpenCV Function reprojectImageTo3D is used, Q matrix must be given.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    xyz : ply</span>
+<span class="sd">        point cloud with ply format.</span>
+<span class="sd">        the points number are rows * columns of the image size.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">with_Q</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">fx</span><span class="p">,</span> <span class="n">fy</span> <span class="o">=</span> <span class="n">cam_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">cam_matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">cam_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">cam_matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">disparity</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">:</span><span class="n">disparity</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">disparity</span> <span class="o">/</span> <span class="n">depth_scale</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="n">cx</span><span class="p">)</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="n">fx</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">cy</span><span class="p">)</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="n">fy</span>
+        <span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span> <span class="k">if</span> <span class="n">flatten</span> <span class="o">==</span> <span class="kc">False</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">threeD</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">reprojectImageTo3D</span><span class="p">(</span><span class="n">disparity</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">handleMissingValues</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">threeD</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">xyz</span></div>
+
+
+<div class="viewcode-block" id="visualization"><a class="viewcode-back" href="../../src.html#src.pcd_generation.visualization">[docs]</a><span class="k">def</span> <span class="nf">visualization</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">save_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize point cloud. Initial filtering of point cloud.</span>
+
+<span class="sd">    Preprocessing of the point cloud, deleting the outliers with z-axis value = 1000.</span>
+<span class="sd">    Save the point cloud as &quot;.ply&quot; file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    points: ply</span>
+<span class="sd">        point cloud.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pcd: ply</span>
+<span class="sd">        the initial filtered point cloud.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># The initial filtering is carried out based on the following criteria.</span>
+    <span class="c1"># Distance from the camera to objects are normally larger than 6 meters.</span>
+    <span class="c1"># Noise equal to 1000 are defined in OpenCV.</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">)</span>
+    <span class="c1"># index = list(index)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># z=1000 is definiert by OpenCV as outlier points.</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">999</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># # visualization using open3D.</span>
+    <span class="n">pcd</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">PointCloud</span><span class="p">()</span>
+    <span class="n">pcd</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">utility</span><span class="o">.</span><span class="n">Vector3dVector</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+    <span class="c1"># o3d.visualization.draw_geometries([pcd])</span>
+
+    <span class="c1"># save point cloud</span>
+    <span class="n">o3d</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">write_point_cloud</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">save_name</span><span class="p">,</span> <span class="n">pcd</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is saving&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">save_name</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">pcd</span></div>
+
+<div class="viewcode-block" id="load_params"><a class="viewcode-back" href="../../src.html#src.pcd_generation.load_params">[docs]</a><span class="k">def</span> <span class="nf">load_params</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load camera matrix and Q matrix used for point cloud converting.</span>
+
+<span class="sd">    Load the camera matrix and Q matrix for point cloud generation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : string</span>
+<span class="sd">        path to save point clouds.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">cm_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;intrinsic.pickle&#39;</span><span class="p">)</span>
+        <span class="n">q_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;extrinsic.pickle&#39;</span><span class="p">)</span>
+        <span class="n">depth_cam_matrix</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">cm_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">))[</span><span class="s1">&#39;M1&#39;</span><span class="p">]</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">q_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">))[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Check the path&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;camera matrix and Q&#39;</span><span class="p">,</span> <span class="n">depth_cam_matrix</span><span class="p">,</span> <span class="n">Q</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">depth_cam_matrix</span><span class="p">,</span> <span class="n">Q</span></div>
+
+
+<span class="c1">####################################################################################################################</span>
+<span class="c1"># # The following sentences are used for point cloud generation.</span>
+<span class="c1"># # If you want to test the result or do some preprocessing filtering, please activate the following sentence.</span>
+
+<span class="c1"># start = time.time()</span>
+<span class="c1">#</span>
+<span class="c1"># # img = cv2.imread(&#39;./result1.png&#39;, -1)</span>
+<span class="c1">#</span>
+<span class="c1"># # depth = cv2.imread(&#39;./depthmap.png&#39;, -1)</span>
+<span class="c1">#</span>
+<span class="c1"># print(&#39;Please enter the ID of the camera pair that needs to be converted to point cloud.&#39;)</span>
+<span class="c1"># print(&#39;Please make sure that the parallel corrected images and the disparity map have been generated &#39;</span>
+<span class="c1">#       &#39;and saved in the same folder.&#39;)</span>
+<span class="c1"># a = input(&quot;Pointcloud:&quot;)</span>
+<span class="c1"># pcd_name = &#39;pointcloud&#39; + a</span>
+<span class="c1"># print(&quot;plname:&quot;, pcd_name)</span>
+<span class="c1"># # get the current working directory.</span>
+<span class="c1"># cur_dir = os.path.abspath(os.path.dirname((__file__)))</span>
+<span class="c1"># print(&#39;cur_dir:&#39;, cur_dir)</span>
+<span class="c1"># # get upper directory.</span>
+<span class="c1"># upper = os.path.abspath(os.path.join(os.getcwd(), &quot;..&quot;))</span>
+<span class="c1"># print(&#39;cur_dir2:&#39;, upper)</span>
+<span class="c1"># img_path = os.path.join(upper, &#39;images&#39;, &#39;device&#39; + str(a), &#39;result1.png&#39;)</span>
+<span class="c1"># disparity_path = os.path.join(upper, &#39;images&#39;, &#39;device&#39; + str(a), &#39;depthmap.png&#39;)</span>
+<span class="c1"># # Read rectified left image and disparity map to generate the point cloud.</span>
+<span class="c1"># img = cv2.imread(img_path, -1)</span>
+<span class="c1"># depth = cv2.imread(disparity_path, -1)</span>
+<span class="c1"># if img is None or depth is None:</span>
+<span class="c1">#     print(&quot;Check path&quot;)</span>
+<span class="c1">#     exit()</span>
+<span class="c1"># img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)</span>
+<span class="c1">#</span>
+<span class="c1"># # colors = img.reshape(-1, 3)</span>
+<span class="c1">#</span>
+<span class="c1"># params_path = os.path.join(upper, &#39;images&#39;, &#39;device&#39; + str(a))</span>
+<span class="c1">#</span>
+<span class="c1"># depth_cam_matrix, Q = load_params(params_path)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># points = depth2xyz(depth, depth_cam_matrix, Q, with_Q=False)</span>
+<span class="c1">#</span>
+<span class="c1"># visualization(points, params_path)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># print(&quot;Point cloud transformation took %.3f sec.\n&quot; % (time.time() - start))</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, University of Stuttgart IFF and Fraunhofer IPA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.pcd_registration &mdash; Masterarbeit 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Masterarbeit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Sequence of code execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about%20main.html">Introduction to the use of mian.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Source code package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Masterarbeit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>src.pcd_registration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.pcd_registration</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">open3d</span> <span class="k">as</span> <span class="nn">o3d</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="Registration"><a class="viewcode-back" href="../../src.html#src.pcd_registration.Registration">[docs]</a><span class="k">class</span> <span class="nc">Registration</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Implementation of point cloud registration.</span>
+
+<span class="sd">    Implementation of 2 point clouds. RANSAC and 2 kinds of ICP(point-to-point and point-to-plane) algorithms are used.</span>
+<span class="sd">    The FPFH features need to be calculated first.</span>
+<span class="sd">    The result of registration will be saved as 4 x 4 matrix in &quot;.txt&quot; and &quot;.pickle&quot; files.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd_1</span><span class="p">,</span> <span class="n">pcd_2</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">filename_1</span><span class="p">,</span> <span class="n">filename_2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor function.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcd_1</span> <span class="o">=</span> <span class="n">pcd_1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcd_2</span> <span class="o">=</span> <span class="n">pcd_2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename_1</span> <span class="o">=</span> <span class="n">filename_1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename_2</span> <span class="o">=</span> <span class="n">filename_2</span>
+
+
+<div class="viewcode-block" id="Registration.FPFH_Compute"><a class="viewcode-back" href="../../src.html#src.pcd_registration.Registration.FPFH_Compute">[docs]</a>    <span class="k">def</span> <span class="nf">FPFH_Compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;FPFH features calculation.</span>
+
+<span class="sd">        Pass in the point cloud data and calculate FPFH.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pcd : ply</span>
+<span class="sd">            point cloud for feature calculation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pcd_fpfh : array</span>
+<span class="sd">            FPFH features.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Prameters of kdtree for estimating the radius of the normal.</span>
+        <span class="n">radius_normal</span> <span class="o">=</span> <span class="mf">0.03</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;:: Estimate normal with search radius </span><span class="si">%.3f</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">radius_normal</span><span class="p">)</span>
+        <span class="n">pcd</span><span class="o">.</span><span class="n">estimate_normals</span><span class="p">(</span>
+            <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">KDTreeSearchParamHybrid</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius_normal</span><span class="p">,</span> <span class="n">max_nn</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span>
+        <span class="c1"># Estimate 1 parameter of the normal, using a hybrid kdtree, taking up to 30 neighbors in the radius</span>
+        <span class="c1"># Kdtree parameter for estimating the radius of FPFH features.</span>
+        <span class="n">radius_feature</span> <span class="o">=</span> <span class="mf">0.06</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;:: Compute FPFH feature with search radius </span><span class="si">%.3f</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">radius_feature</span><span class="p">)</span>
+        <span class="c1"># Calculating FPFH features using the kdtree search method.</span>
+        <span class="n">pcd_fpfh</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">compute_fpfh_feature</span><span class="p">(</span><span class="n">pcd</span><span class="p">,</span>
+                                                                   <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">KDTreeSearchParamHybrid</span><span class="p">(</span>
+                                                                       <span class="n">radius</span><span class="o">=</span><span class="n">radius_feature</span><span class="p">,</span> <span class="n">max_nn</span><span class="o">=</span><span class="mi">100</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">pcd_fpfh</span></div>
+
+
+<div class="viewcode-block" id="Registration.execute_global_registration"><a class="viewcode-back" href="../../src.html#src.pcd_registration.Registration.execute_global_registration">[docs]</a>    <span class="k">def</span> <span class="nf">execute_global_registration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">source_fpfh</span><span class="p">,</span> <span class="n">target_fpfh</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Implement the global registration using RANSAC.</span>
+
+<span class="sd">        Point Cloud global registration.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        source : ply</span>
+<span class="sd">            source point cloud.</span>
+<span class="sd">        target : ply</span>
+<span class="sd">            target point cloud.</span>
+<span class="sd">        source_fpfh: FPFH features of source point cloud.</span>
+<span class="sd">        target_fpfh: FPFH features of target point cloud.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ransac_result : 4X4 matrix</span>
+<span class="sd">            the results of the global registration.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Threshold of distance. It is 0.5 times the size of the voxel.</span>
+        <span class="n">distance_threshold</span> <span class="o">=</span> <span class="mf">0.04</span> <span class="o">*</span> <span class="mf">1.5</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;we use a liberal distance threshold </span><span class="si">%.3f</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">distance_threshold</span><span class="p">)</span>
+        <span class="c1"># Execute global registration using the ransac algorithm.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ransac_result</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">registration_ransac_based_on_feature_matching</span><span class="p">(</span>
+            <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">source_fpfh</span><span class="p">,</span> <span class="n">target_fpfh</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">distance_threshold</span><span class="p">,</span>
+            <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">TransformationEstimationPointToPoint</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span>
+            <span class="mi">4</span><span class="p">,</span> <span class="p">[</span>
+                <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">CorrespondenceCheckerBasedOnEdgeLength</span><span class="p">(</span>
+                    <span class="mf">0.9</span><span class="p">),</span>
+                <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">CorrespondenceCheckerBasedOnDistance</span><span class="p">(</span>
+                    <span class="n">distance_threshold</span><span class="p">)</span>
+            <span class="p">],</span> <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">RANSACConvergenceCriteria</span><span class="p">(</span><span class="mi">100000</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;+ &#39;_&#39;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ransac_result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ransac_result</span></div>
+
+
+<div class="viewcode-block" id="Registration.draw_registration_result"><a class="viewcode-back" href="../../src.html#src.pcd_registration.Registration.draw_registration_result">[docs]</a>    <span class="k">def</span> <span class="nf">draw_registration_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">transformation</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Visulization the registration rsult.</span>
+
+<span class="sd">        Visulization of global registration.</span>
+<span class="sd">        Target and source point cloud are painted with green and red colours.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        source : ply</span>
+<span class="sd">            source point cloud.</span>
+<span class="sd">        target : ply</span>
+<span class="sd">            target point cloud.</span>
+<span class="sd">        transformation : 4 x 4 matrix</span>
+<span class="sd">            result of registration.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># The function ”paint_uniform_color“ changes the point cloud.</span>
+        <span class="c1"># So copy.deepcoy is invoked to copy and protect the original point cloud.</span>
+        <span class="n">source_temp</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="n">target_temp</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="c1"># Point cloud painting.</span>
+        <span class="n">source_temp</span><span class="o">.</span><span class="n">paint_uniform_color</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>  <span class="c1"># Point cloud painting</span>
+        <span class="n">target_temp</span><span class="o">.</span><span class="n">paint_uniform_color</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">source_temp</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">transformation</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Registration.execute_local_registration"><a class="viewcode-back" href="../../src.html#src.pcd_registration.Registration.execute_local_registration">[docs]</a>    <span class="k">def</span> <span class="nf">execute_local_registration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">result_ransac</span><span class="p">,</span> <span class="n">p_2_p</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Implement the local registration using ICP.</span>
+
+<span class="sd">        Implement the local registration by using point-to-point ICP or point-to-plane ICP.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        source : ply</span>
+<span class="sd">            source point cloud.</span>
+<span class="sd">        target : ply</span>
+<span class="sd">            target point cloud.</span>
+<span class="sd">        result_ransac : 4 x 4 matrix</span>
+<span class="sd">            result of ransac registration.</span>
+<span class="sd">        p_2_p : bool</span>
+<span class="sd">            True: use point-to-point ICP.</span>
+<span class="sd">            False: use point-to-plane ICP.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        icp.transformation :  4 X 4 matrix</span>
+<span class="sd">            results of the global registration.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">p_2_p</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Apply point-to-point ICP&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">icp</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">registration_icp</span><span class="p">(</span>
+                <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">result_ransac</span><span class="o">.</span><span class="n">transformation</span><span class="p">,</span>
+                <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">TransformationEstimationPointToPlane</span><span class="p">(),</span>    <span class="c1"># implemente the point-to-point ICP.</span>
+                <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">ICPConvergenceCriteria</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span>  <span class="c1"># set the maximum iteration number.</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ICP point-to-point registration took </span><span class="si">%.3f</span><span class="s2"> sec.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icp</span><span class="p">)</span>  <span class="c1"># display ICP result.</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transformation of ICP is:&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icp</span><span class="o">.</span><span class="n">transformation</span><span class="p">)</span>  <span class="c1"># display registration transformation.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Apply point-to-plane ICP&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">icp</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">registration_icp</span><span class="p">(</span>
+                    <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">result_ransac</span><span class="o">.</span><span class="n">transformation</span><span class="p">,</span>
+                    <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">TransformationEstimationPointToPlane</span><span class="p">(),</span> <span class="c1"># implemente the point-to-plane ICP.</span>
+                    <span class="n">o3d</span><span class="o">.</span><span class="n">pipelines</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">ICPConvergenceCriteria</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span> <span class="c1"># set the maximum iteration number.</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ICP point-to-plane registration took </span><span class="si">%.3f</span><span class="s2"> sec.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icp</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transformation of ICP is:&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icp</span><span class="o">.</span><span class="n">transformation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ICP</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="s1">&#39;ICP&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">icp</span><span class="o">.</span><span class="n">transformation</span><span class="p">)</span>
+        <span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icp</span><span class="o">.</span><span class="n">transformation</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">save_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save the transformation matrix of ICP as &quot;.txt&quot; file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename_1</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="c1"># filename.write(str(self.ransac_result))</span>
+        <span class="c1"># filename.write(&#39;\n&#39;)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ICP</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">filename</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="n">filename</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ICP result is saved as txt file.&quot;</span><span class="p">)</span>
+        <span class="n">filename</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">save_pickle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save the transformation matrix of ICP as &quot;.pickle&quot; file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">save_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename_2</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ICP</span><span class="p">,</span> <span class="n">save_file</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ICP result is saved as pickle file.&quot;</span><span class="p">)</span>
+        <span class="n">save_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Registration.get_global_local"><a class="viewcode-back" href="../../src.html#src.pcd_registration.Registration.get_global_local">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="draw_registration_result"><a class="viewcode-back" href="../../src.html#src.pcd_registration.draw_registration_result">[docs]</a><span class="k">def</span> <span class="nf">draw_registration_result</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">transformation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Visulization the registration rsult.</span>
+
+<span class="sd">    Visulization of global registration.</span>
+<span class="sd">    Target and source point cloud are painted with green and red colours.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    source : ply</span>
+<span class="sd">        source point cloud.</span>
+<span class="sd">    target : ply</span>
+<span class="sd">        target point cloud.</span>
+<span class="sd">    transformation : 4 x 4 matrix</span>
+<span class="sd">        result of registration.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># The function ”paint_uniform_color“ changes the point cloud.</span>
+    <span class="c1"># So copy.deepcoy is invoked to copy and protect the original point cloud.</span>
+    <span class="n">source_temp</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+    <span class="n">target_temp</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="c1"># Point cloud painting.</span>
+    <span class="n">source_temp</span><span class="o">.</span><span class="n">paint_uniform_color</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>  <span class="c1"># Point cloud painting</span>
+    <span class="n">target_temp</span><span class="o">.</span><span class="n">paint_uniform_color</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">source_temp</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">transformation</span><span class="p">)</span></div>
+
+<span class="c1">####################################################################################################################</span>
+<span class="c1"># # The following sentences are used for point cloud registration.</span>
+<span class="c1"># # If you want to registrate 2 point clouds, please activate the following sentence.</span>
+
+<span class="c1"># print(&#39;Please choose the ID of the camera pair to be registered.&#39;)</span>
+<span class="c1"># Nr1 = input(&quot;registrate_pcd_1:&quot;)</span>
+<span class="c1"># Nr2 = input(&quot;registrate_pcd_2:&quot;)</span>
+<span class="c1"># start = time.time()</span>
+<span class="c1"># registrate_ID_1, registrate_ID_2 = &#39;pcd_&#39; + Nr1, &#39;pcd_&#39; + Nr2</span>
+<span class="c1"># print(&quot;The selected camera pairs are:&quot;, registrate_ID_1, registrate_ID_2)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># # get the current working directory.</span>
+<span class="c1"># cur_dir = os.path.abspath(os.path.dirname((__file__)))</span>
+<span class="c1"># # get upper directory.</span>
+<span class="c1"># upper = os.path.abspath(os.path.join(os.getcwd(), &quot;..&quot;))</span>
+<span class="c1"># pcd_1_path = os.path.join(upper, &#39;images&#39;, &#39;device&#39; + str(Nr1), str(registrate_ID_1) + &#39;.ply&#39;)</span>
+<span class="c1"># pcd_2_path = os.path.join(upper, &#39;images&#39;, &#39;device&#39; + str(Nr2), str(registrate_ID_2) + &#39;.ply&#39;)</span>
+
+<span class="c1">#</span>
+<span class="c1"># filename_txt = os.path.join(cur_dir, &#39;registration_result&#39; + &#39;_&#39; + str(Nr1) + &#39;_&#39; + str(Nr2) + &#39;.txt&#39;)</span>
+<span class="c1"># filename_pickle = os.path.join(cur_dir, &#39;registration_result&#39; + &#39;_&#39; + str(Nr1) + &#39;_&#39; + str(Nr2) + &#39;.pickle&#39;)</span>
+<span class="c1"># print(&quot;saved file name：&quot;, filename_txt, filename_pickle)</span>
+<span class="c1">#</span>
+<span class="c1"># source = o3d.io.read_point_cloud(pcd_1_path)</span>
+<span class="c1"># target = o3d.io.read_point_cloud(pcd_2_path)</span>
+<span class="c1">#</span>
+<span class="c1"># registrate = Registration(source, target, cur_dir, filename_txt, filename_pickle)</span>
+<span class="c1"># source_fpfh = registrate.FPFH_Compute(source)</span>
+<span class="c1"># target_fpfh = registrate.FPFH_Compute(target)</span>
+<span class="c1">#</span>
+<span class="c1"># voxel_size = 0.002</span>
+<span class="c1"># source = source.voxel_down_sample(voxel_size)</span>
+<span class="c1"># target = target.voxel_down_sample(voxel_size)</span>
+<span class="c1">#</span>
+
+<span class="c1"># # Implementation of global registration</span>
+<span class="c1"># start = time.time()</span>
+<span class="c1">#</span>
+<span class="c1"># result_ransac = registrate.execute_global_registration(source, target, source_fpfh, target_fpfh)</span>
+<span class="c1"># registrate.execute_local_registration(source, target, result_ransac, p_2_p=True)</span>
+<span class="c1"># registrate.save_txt</span>
+<span class="c1"># registrate.save_pickle</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># print(&quot;Global registration took %.3f sec.\n&quot; % (time.time() - start))</span>
+<span class="c1"># print(result_ransac)</span>
+<span class="c1"># # Rotation and translation of the source point cloud to the target point cloud</span>
+<span class="c1"># # draw_registration_result(source, target, result_ransac.transformation)</span>
+<span class="c1"># # draw_registration_result(source, target, icp_p2p.transformation)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, University of Stuttgart IFF and Fraunhofer IPA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

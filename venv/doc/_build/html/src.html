@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src package &mdash; Masterarbeit 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Source code package" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Masterarbeit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Sequence of code execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about%20main.html">Introduction to the use of mian.py</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Source code package</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">src package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.calibration">src.calibration module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.disp_generation">src.disp_generation module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.pcd_generation">src.pcd_generation module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.pcd_registration">src.pcd_registration module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.pl_preprocessing">src.pl_preprocessing module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.stereorectify">src.stereorectify module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Masterarbeit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="modules.html">Source code package</a> &raquo;</li>
+      <li>src package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="src-package">
+<h1>src package<a class="headerlink" href="#src-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-src.calibration">
+<span id="src-calibration-module"></span><h2>src.calibration module<a class="headerlink" href="#module-src.calibration" title="Permalink to this heading">¶</a></h2>
+<p>author: yifeng
+date  : 23.02.2022</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.calibration.Camera">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Camera</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_num</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#Camera"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.Camera" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Create folders for image and result storage. Each folder stores several pairs of images taken by a camera pair.
+Each calibration result, including intrinsic and extrinsic parameters.
+And the corresponding rectified image pair will be saved here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#src.calibration.Camera.get_dir" title="src.calibration.Camera.get_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dir</span></code></a></dt><dd><p>Get the directories to storage the images.</p>
+</dd>
+<dt><a class="reference internal" href="#src.calibration.Camera.get_id" title="src.calibration.Camera.get_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_id</span></code></a></dt><dd><p>Get the ID of camera pair.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="src.calibration.Camera.get_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_dir</span></span><a class="headerlink" href="#src.calibration.Camera.get_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the directories to storage the images.</p>
+<p>Folder operation. Get the current and upper directories.
+Create a corresponding folder under a certain ID to store the images that used for calibration.
+The structure of the folder is like this.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>path</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>the path of the folder which stores all the images of the camera pair.</p>
+</dd>
+<dt><strong>path_resize_l</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>path of the sub folder which stores all the images taken by the left camera.</p>
+</dd>
+<dt><strong>path_resize_r</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>path of the sub folder which stores all the images taken by the right camera.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.calibration.Camera.get_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_id</span></span><a class="headerlink" href="#src.calibration.Camera.get_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the ID of camera pair.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>self._id</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>ID of the camera pair.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.calibration.CameraCalibration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CameraCalibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern_choice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_list_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_list_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#CameraCalibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.CameraCalibration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Intrinsic and extrinsic calibration.</p>
+<p>Intrinsic camera calibration. intrinsic parameters, such as camera matrix and distortion will be determined.
+Stereo camera calibration. extrinsic parameters, such as Rotation and Translation between the camera pair
+will be calculated.
+After calibration, the intrinsic and extrinsic will be saved as ”.txt“ and ”.pickle“ files.
+”.txt“ is used for reading. ”.pickle“ is easy for data extraction.
+Pattern selections: pattern = [“square”, “circle”, “charuco”]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#src.calibration.CameraCalibration.save_pickle" title="src.calibration.CameraCalibration.save_pickle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_pickle</span></code></a></dt><dd><p>Save the intrinsic and extrinsic parameters as “.pickle” file.</p>
+</dd>
+<dt><a class="reference internal" href="#src.calibration.CameraCalibration.save_txt" title="src.calibration.CameraCalibration.save_txt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_txt</span></code></a></dt><dd><p>Save the intrinsic and extrinsic parameters as “.txt” file.</p>
+</dd>
+<dt><a class="reference internal" href="#src.calibration.CameraCalibration.validate_square" title="src.calibration.CameraCalibration.validate_square"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_square</span></code></a></dt><dd><p>Compute and print RMS errors of each left image.</p>
+</dd>
+<dt><a class="reference internal" href="#src.calibration.CameraCalibration.validate_square_2" title="src.calibration.CameraCalibration.validate_square_2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_square_2</span></code></a></dt><dd><p>Compute and print RMS errors of each right image.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.calibration.CameraCalibration.binarization" title="src.calibration.CameraCalibration.binarization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binarization</span></code></a>(gray_image)</p></td>
+<td><p>Apply fixed-level thresholding to a multiple-channel array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.calibration.CameraCalibration.distortion" title="src.calibration.CameraCalibration.distortion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">distortion</span></code></a>(img, mtx, dist)</p></td>
+<td><p>Refine the camera matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.calibration.CameraCalibration.gray_scale" title="src.calibration.CameraCalibration.gray_scale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gray_scale</span></code></a>(img)</p></td>
+<td><p>Convert image to grayscale.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.calibration.CameraCalibration.method_manager" title="src.calibration.CameraCalibration.method_manager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">method_manager</span></code></a>(*args)</p></td>
+<td><p>Manage the implementation of calibration.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.calibration.CameraCalibration.resize" title="src.calibration.CameraCalibration.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize</span></code></a>(gray_image)</p></td>
+<td><p>Change image size to image shape.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.calibration.CameraCalibration.binarization">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">binarization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#CameraCalibration.binarization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.CameraCalibration.binarization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply fixed-level thresholding to a multiple-channel array.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>th1</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>image after binarization.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.calibration.CameraCalibration.distortion">
+<span class="sig-name descname"><span class="pre">distortion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#CameraCalibration.distortion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.CameraCalibration.distortion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refine the camera matrix.
+Refine the obtained camera matrix.
+Get the cropped valid area of the images.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>mtx</strong><span class="classifier">3 <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> 3  <code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix</span></code></span></dt><dd><p>camera intrinsic matrix.</p>
+</dd>
+<dt><strong>dist</strong><span class="classifier">1 <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> 5 <code class="xref py py-obj docutils literal notranslate"><span class="pre">vector</span></code></span></dt><dd><p>distortion vector.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>newcameramatrix</strong><span class="classifier">3 <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> 3  <code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix</span></code></span></dt><dd><p>the refined camera matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.calibration.CameraCalibration.gray_scale">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gray_scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#CameraCalibration.gray_scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.CameraCalibration.gray_scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert image to grayscale.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>gray</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>image of grayscale.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.calibration.CameraCalibration.method_manager">
+<span class="sig-name descname"><span class="pre">method_manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#CameraCalibration.method_manager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.CameraCalibration.method_manager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manage the implementation of calibration.</p>
+<p>The calibration function can be invoked automatically by specifying the size of the calibration pattern.
+3 kinds of calibration patterns can be chosen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>args</strong></dt><dd><p>please define the number of the row points(corners), column points(corners)
+and the distance of the adjacent points(corners) with the unit meter.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">The</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">camera</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">model</span></code> parameters.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.calibration.CameraCalibration.resize">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">resize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#CameraCalibration.resize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.CameraCalibration.resize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change image size to image shape.</p>
+<p>Different from OpenCV’s cv2.resize function, this function is not used to modify the original size of the image.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>resize</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>shape of the image.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.calibration.CameraCalibration.save_pickle">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_pickle</span></span><a class="headerlink" href="#src.calibration.CameraCalibration.save_pickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the intrinsic and extrinsic parameters as “.pickle” file.</p>
+<p>Save the intrinsic and extrinsic parameters as “.pickle” file.
+The pickle file facilitates the extraction of the parameters during running of codes.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.calibration.CameraCalibration.save_txt">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_txt</span></span><a class="headerlink" href="#src.calibration.CameraCalibration.save_txt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the intrinsic and extrinsic parameters as “.txt” file.</p>
+<p>Save the intrinsic and extrinsic parameters as “.txt” file.
+The txt file facilitates a manual confirmation of the intrinsic and extrinsic matrices.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.calibration.CameraCalibration.validate_square">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_square</span></span><a class="headerlink" href="#src.calibration.CameraCalibration.validate_square" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and print RMS errors of each left image.</p>
+<p>RMS is used for indicate the accuracy of the detected features on the calibration pattern.
+Calculate and display the re-projection error to each image of left camera.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.calibration.CameraCalibration.validate_square_2">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_square_2</span></span><a class="headerlink" href="#src.calibration.CameraCalibration.validate_square_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and print RMS errors of each right image.</p>
+<p>RMS is used for indicate the accuracy of the detected features on the calibration pattern.
+Calculate and display the re-projection error to each image of right camera.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.calibration.PhotoSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PhotoSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir_r</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#PhotoSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.PhotoSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Convert the images to python numpy arrays.</p>
+<p>Images operation. Store the photos taken by the left and right cameras to the corresponding sub folders.
+Read these two sets of photos separately and concatenate them as a numpy array.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.calibration.PhotoSet.image_to_matrix" title="src.calibration.PhotoSet.image_to_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">image_to_matrix</span></code></a>([exist_dict])</p></td>
+<td><p>Convert and save the images in a list of array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.calibration.PhotoSet.resize" title="src.calibration.PhotoSet.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize</span></code></a>(img)</p></td>
+<td><p>Change the image resolution to smaller.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.calibration.PhotoSet.image_to_matrix">
+<span class="sig-name descname"><span class="pre">image_to_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exist_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#PhotoSet.image_to_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.PhotoSet.image_to_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert and save the images in a list of array.</p>
+<p>All the images taken by the same camera will be read as “np.array” format and stored as a python “list”.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Please notice the layout of the camera pair. If the cameras are horizontal placed, no need to rotate the
+images. If the camera pair is vertical placed, the images need to be rotated for 90 degrees or 270 degrees.</p>
+</div>
+<a class="reference internal image-reference" href="_images/cameralayout1.png" id="horizontal-layout"><img alt="_images/cameralayout1.png" class="align-center" id="horizontal-layout" src="_images/cameralayout1.png" style="width: 406.8px; height: 199.8px;" /></a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<a class="reference internal image-reference" href="_images/cameralayout2.png" id="vertical-layout"><img alt="_images/cameralayout2.png" class="align-center" id="vertical-layout" src="_images/cameralayout2.png" style="width: 351.0px; height: 210.6px;" /></a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>self._images_l</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a>)</span></dt><dd><p>an array containing all the image of the left camera.</p>
+</dd>
+<dt><strong>self._images_r</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a>)</span></dt><dd><p>an array containing all the image of the right camera.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.calibration.PhotoSet.resize">
+<span class="sig-name descname"><span class="pre">resize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#PhotoSet.resize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.PhotoSet.resize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the image resolution to smaller.</p>
+<p>Used to resize the original image.
+In order to preserve the calibration accuracy, it is not recommended to resize the original images.
+The resized image can lead to subsequent calibration accuracy and disparity map calculations with large errors.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>img</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a>)</span></dt><dd><p>the images need to be resized.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>img_resize</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a>)</span></dt><dd><p>the resized image with a lower resolution.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.calibration.StereoRectify">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">StereoRectify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">camera_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#StereoRectify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.StereoRectify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Rectify the image pair using the obtained intrinsic and extrinsic parameters.</p>
+<p>Rectification of the image pair.
+Draw the epi-polar lines to simplify the search of the corresponding feature points in left and right image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#src.calibration.StereoRectify.save_pickle" title="src.calibration.StereoRectify.save_pickle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_pickle</span></code></a></dt><dd><p>Save the intrinsic and extrinsic parameters as “.pickle” file.</p>
+</dd>
+<dt><a class="reference internal" href="#src.calibration.StereoRectify.save_txt" title="src.calibration.StereoRectify.save_txt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_txt</span></code></a></dt><dd><p>Save the intrinsic and extrinsic parameters as “.txt” file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.calibration.StereoRectify.draw_line" title="src.calibration.StereoRectify.draw_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_line</span></code></a>(image1, image2)</p></td>
+<td><p>Draw lines to present the result of the rectified images.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.calibration.StereoRectify.get_rectify_transform" title="src.calibration.StereoRectify.get_rectify_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rectify_transform</span></code></a>()</p></td>
+<td><p>Calculate the rectified parameters to implement the parallel correction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.calibration.StereoRectify.rectify_image" title="src.calibration.StereoRectify.rectify_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rectify_image</span></code></a>(grayl, grayr)</p></td>
+<td><p>Implement the parallel rectification.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.calibration.StereoRectify.draw_line">
+<span class="sig-name descname"><span class="pre">draw_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#StereoRectify.draw_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.StereoRectify.draw_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw lines to present the result of the rectified images.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>image1</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>rectified left image.</p>
+</dd>
+<dt><strong>image2</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>rectified right image.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">horizontal</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">stacked</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">image</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">pair</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">polar</span></code> lines.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.calibration.StereoRectify.get_rectify_transform">
+<span class="sig-name descname"><span class="pre">get_rectify_transform</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#StereoRectify.get_rectify_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.StereoRectify.get_rectify_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the rectified parameters to implement the parallel correction.</p>
+<p>Get the rectified camera model. Preparing for the parallel correction.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>rectify_model</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dictionary</span></code></span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.calibration.StereoRectify.rectify_image">
+<span class="sig-name descname"><span class="pre">rectify_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grayl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grayr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#StereoRectify.rectify_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.StereoRectify.rectify_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the parallel rectification.</p>
+<p>rectify the image pair. Save and show them.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>grayl</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>gray image of left camera used for rectification.</p>
+</dd>
+<dt><strong>grayr</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>gray image of right camera used for rectification.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.calibration.StereoRectify.save_pickle">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_pickle</span></span><a class="headerlink" href="#src.calibration.StereoRectify.save_pickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the intrinsic and extrinsic parameters as “.pickle” file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.calibration.StereoRectify.save_txt">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_txt</span></span><a class="headerlink" href="#src.calibration.StereoRectify.save_txt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the intrinsic and extrinsic parameters as “.txt” file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.calibration.store">
+<span class="sig-name descname"><span class="pre">store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.store" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.calibration.write_txt">
+<span class="sig-name descname"><span class="pre">write_txt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#write_txt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.write_txt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.calibration.write_txt0">
+<span class="sig-name descname"><span class="pre">write_txt0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/calibration.html#write_txt0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.calibration.write_txt0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-src.disp_generation">
+<span id="src-disp-generation-module"></span><h2>src.disp_generation module<a class="headerlink" href="#module-src.disp_generation" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.disp_generation.stereo_matchSGBM">
+<span class="sig-name descname"><span class="pre">stereo_matchSGBM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/disp_generation.html#stereo_matchSGBM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.disp_generation.stereo_matchSGBM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disparity calculating using SGBM algorithm.</p>
+<p>Calculate the disparity map use SGBM algorithm.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>left_image</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>the rectified left image.</p>
+</dd>
+<dt><strong>right_image</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>the rectified right image.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">Disparity</span></code> map.</dt><dd></dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Considering that the physical installation parameters of each camera pair are different, and the different
+capture times of the images used for calibration result in varying image brightness and sharpness, the parameters
+for generating disparity maps shall be tuned accordingly. The key parameters to be tuned are minDisparity,
+numDisparities and blockSize.</p>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.pcd_generation">
+<span id="src-pcd-generation-module"></span><h2>src.pcd_generation module<a class="headerlink" href="#module-src.pcd_generation" title="Permalink to this heading">¶</a></h2>
+<p>author: yifeng
+date  : 27.03.2022</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pcd_generation.depth2xyz">
+<span class="sig-name descname"><span class="pre">depth2xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">disparity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cam_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_Q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pcd_generation.html#depth2xyz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pcd_generation.depth2xyz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the 2D image to 3D point cloud.</p>
+<p>convert disparity map to 3D point cloud using camera intrinsic parameters and Q matrix..</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>disparity</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>disparity map. The better the disparity map, the more accurate the point cloud is.</p>
+</dd>
+<dt><strong>cam_matrix</strong><span class="classifier">4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> 4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix</span></code></span></dt><dd><p>intrinsic parameters of the left camera.</p>
+</dd>
+<dt><strong>Q</strong><span class="classifier">4×4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix</span></code></span></dt><dd><p>disparity-to-depth mapping matrix.</p>
+</dd>
+<dt><strong>flatten</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.10)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>stack all the points in point cloud together.</p>
+</dd>
+<dt><strong>with_Q</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.10)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>if the OpenCV Function reprojectImageTo3D is used, Q matrix must be given.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>xyz</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>point cloud with ply format.
+the points number are rows * columns of the image size.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pcd_generation.load_params">
+<span class="sig-name descname"><span class="pre">load_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pcd_generation.html#load_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pcd_generation.load_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load camera matrix and Q matrix used for point cloud converting.</p>
+<p>Load the camera matrix and Q matrix for point cloud generation.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>path</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>path to save point clouds.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pcd_generation.visualization">
+<span class="sig-name descname"><span class="pre">visualization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pcd_generation.html#visualization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pcd_generation.visualization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize point cloud. Initial filtering of point cloud.</p>
+<p>Preprocessing of the point cloud, deleting the outliers with z-axis value = 1000.
+Save the point cloud as “.ply” file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>points: ply</strong></dt><dd><p>point cloud.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>pcd: <code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></dt><dd><p>the initial filtered point cloud.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.pcd_registration">
+<span id="src-pcd-registration-module"></span><h2>src.pcd_registration module<a class="headerlink" href="#module-src.pcd_registration" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.pcd_registration.Registration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Registration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pcd_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pcd_registration.html#Registration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pcd_registration.Registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Implementation of point cloud registration.</p>
+<p>Implementation of 2 point clouds. RANSAC and 2 kinds of ICP(point-to-point and point-to-plane) algorithms are used.
+The FPFH features need to be calculated first.
+The result of registration will be saved as 4 x 4 matrix in “.txt” and “.pickle” files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#src.pcd_registration.Registration.save_pickle" title="src.pcd_registration.Registration.save_pickle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_pickle</span></code></a></dt><dd><p>Save the transformation matrix of ICP as “.pickle” file.</p>
+</dd>
+<dt><a class="reference internal" href="#src.pcd_registration.Registration.save_txt" title="src.pcd_registration.Registration.save_txt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_txt</span></code></a></dt><dd><p>Save the transformation matrix of ICP as “.txt” file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.pcd_registration.Registration.FPFH_Compute" title="src.pcd_registration.Registration.FPFH_Compute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FPFH_Compute</span></code></a>(pcd)</p></td>
+<td><p>FPFH features calculation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.pcd_registration.Registration.draw_registration_result" title="src.pcd_registration.Registration.draw_registration_result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_registration_result</span></code></a>(source, target, ...)</p></td>
+<td><p>Visulization the registration rsult.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.pcd_registration.Registration.execute_global_registration" title="src.pcd_registration.Registration.execute_global_registration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute_global_registration</span></code></a>(source, target, ...)</p></td>
+<td><p>Implement the global registration using RANSAC.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.pcd_registration.Registration.execute_local_registration" title="src.pcd_registration.Registration.execute_local_registration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute_local_registration</span></code></a>(source, target, ...)</p></td>
+<td><p>Implement the local registration using ICP.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 67%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>get_global_local</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pcd_registration.Registration.FPFH_Compute">
+<span class="sig-name descname"><span class="pre">FPFH_Compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pcd_registration.html#Registration.FPFH_Compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pcd_registration.Registration.FPFH_Compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>FPFH features calculation.</p>
+<p>Pass in the point cloud data and calculate FPFH.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>pcd</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>point cloud for feature calculation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>pcd_fpfh</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>FPFH features.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pcd_registration.Registration.draw_registration_result">
+<span class="sig-name descname"><span class="pre">draw_registration_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pcd_registration.html#Registration.draw_registration_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pcd_registration.Registration.draw_registration_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visulization the registration rsult.</p>
+<p>Visulization of global registration.
+Target and source point cloud are painted with green and red colours.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>source</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>source point cloud.</p>
+</dd>
+<dt><strong>target</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>target point cloud.</p>
+</dd>
+<dt><strong>transformation</strong><span class="classifier">4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> 4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix</span></code></span></dt><dd><p>result of registration.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pcd_registration.Registration.execute_global_registration">
+<span class="sig-name descname"><span class="pre">execute_global_registration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_fpfh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_fpfh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pcd_registration.html#Registration.execute_global_registration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pcd_registration.Registration.execute_global_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the global registration using RANSAC.</p>
+<p>Point Cloud global registration.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>source</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>source point cloud.</p>
+</dd>
+<dt><strong>target</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>target point cloud.</p>
+</dd>
+<dt><strong>source_fpfh: FPFH features of source point cloud.</strong></dt><dd></dd>
+<dt><strong>target_fpfh: FPFH features of target point cloud.</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>ransac_result</strong><span class="classifier">4X4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix</span></code></span></dt><dd><p>the results of the global registration.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pcd_registration.Registration.execute_local_registration">
+<span class="sig-name descname"><span class="pre">execute_local_registration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_ransac</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_2_p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pcd_registration.html#Registration.execute_local_registration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pcd_registration.Registration.execute_local_registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the local registration using ICP.</p>
+<p>Implement the local registration by using point-to-point ICP or point-to-plane ICP.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>source</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>source point cloud.</p>
+</dd>
+<dt><strong>target</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>target point cloud.</p>
+</dd>
+<dt><strong>result_ransac</strong><span class="classifier">4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> 4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix</span></code></span></dt><dd><p>result of ransac registration.</p>
+</dd>
+<dt><strong>p_2_p</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.10)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>True: use point-to-point ICP.
+False: use point-to-plane ICP.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>icp.transformation</strong><span class="classifier">4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">X</span></code> 4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix</span></code></span></dt><dd><p>results of the global registration.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pcd_registration.Registration.get_global_local">
+<span class="sig-name descname"><span class="pre">get_global_local</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pcd_registration.html#Registration.get_global_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pcd_registration.Registration.get_global_local" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.pcd_registration.Registration.save_pickle">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_pickle</span></span><a class="headerlink" href="#src.pcd_registration.Registration.save_pickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the transformation matrix of ICP as “.pickle” file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.pcd_registration.Registration.save_txt">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_txt</span></span><a class="headerlink" href="#src.pcd_registration.Registration.save_txt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the transformation matrix of ICP as “.txt” file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pcd_registration.draw_registration_result">
+<span class="sig-name descname"><span class="pre">draw_registration_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pcd_registration.html#draw_registration_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pcd_registration.draw_registration_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visulization the registration rsult.</p>
+<p>Visulization of global registration.
+Target and source point cloud are painted with green and red colours.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>source</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>source point cloud.</p>
+</dd>
+<dt><strong>target</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>target point cloud.</p>
+</dd>
+<dt><strong>transformation</strong><span class="classifier">4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> 4 <code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix</span></code></span></dt><dd><p>result of registration.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.pl_preprocessing">
+<span id="src-pl-preprocessing-module"></span><h2>src.pl_preprocessing module<a class="headerlink" href="#module-src.pl_preprocessing" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.pl_preprocessing.PointcloudPrep">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PointcloudPrep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pl_preprocessing.html#PointcloudPrep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pl_preprocessing.PointcloudPrep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Preprocessing of point cloud.</p>
+<p>Implementation the point cloud downsampling and filtering.
+Voxel downsampling, uni downsampling and statistical filtering, radius filtering can be chosen.
+Normally, voxel downsampling + statistaical- + radius filtering are used sequentially.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#src.pl_preprocessing.PointcloudPrep.voxel_down_filter" title="src.pl_preprocessing.PointcloudPrep.voxel_down_filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">voxel_down_filter</span></code></a></dt><dd><p>Voxel down sampling.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.pl_preprocessing.PointcloudPrep.display_inlier_outlier" title="src.pl_preprocessing.PointcloudPrep.display_inlier_outlier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_inlier_outlier</span></code></a>(pcd, ind[, stat])</p></td>
+<td><p>Display inlier and outlier of the point cloud.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.pl_preprocessing.PointcloudPrep.point_display" title="src.pl_preprocessing.PointcloudPrep.point_display"><code class="xref py py-obj docutils literal notranslate"><span class="pre">point_display</span></code></a>(pcd)</p></td>
+<td><p>Display point cloud.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.pl_preprocessing.PointcloudPrep.radius_removal" title="src.pl_preprocessing.PointcloudPrep.radius_removal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius_removal</span></code></a>(pcd)</p></td>
+<td><p>Implement radius filtering.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.pl_preprocessing.PointcloudPrep.statistical_removal" title="src.pl_preprocessing.PointcloudPrep.statistical_removal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statistical_removal</span></code></a>(pcd)</p></td>
+<td><p>Implement statistical filtering.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.pl_preprocessing.PointcloudPrep.uni_down_filter" title="src.pl_preprocessing.PointcloudPrep.uni_down_filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uni_down_filter</span></code></a>(pcd)</p></td>
+<td><p>Uniform down sampling.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pl_preprocessing.PointcloudPrep.display_inlier_outlier">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">display_inlier_outlier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pl_preprocessing.html#PointcloudPrep.display_inlier_outlier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pl_preprocessing.PointcloudPrep.display_inlier_outlier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display inlier and outlier of the point cloud.</p>
+<p>Display inlier and outlier of the point cloud.
+The outliers are pained with yellow, the remaining inlier points are gray.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>pcd</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>point cloud.</p>
+</dd>
+<dt><strong>ind</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>)</span></dt><dd><p>the Serial Number of outliers.</p>
+</dd>
+<dt><strong>stat</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.10)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>True: show statistical filtering result.
+False: show radius filtering result.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>inlier_cloud</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>point cloud after filtering.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pl_preprocessing.PointcloudPrep.point_display">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">point_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pl_preprocessing.html#PointcloudPrep.point_display"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pl_preprocessing.PointcloudPrep.point_display" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display point cloud.</p>
+<p>Point cloud display.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>pcd</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>point cloud.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pl_preprocessing.PointcloudPrep.radius_removal">
+<span class="sig-name descname"><span class="pre">radius_removal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pl_preprocessing.html#PointcloudPrep.radius_removal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pl_preprocessing.PointcloudPrep.radius_removal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement radius filtering.</p>
+<p>remove the outlier points with radius outlier remover filter.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>pcd</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>point cloud.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>inlier</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>point cloud after statistical filtering.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pl_preprocessing.PointcloudPrep.statistical_removal">
+<span class="sig-name descname"><span class="pre">statistical_removal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pl_preprocessing.html#PointcloudPrep.statistical_removal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pl_preprocessing.PointcloudPrep.statistical_removal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement statistical filtering.</p>
+<p>remove the outlier points with statistical outlier remover filter.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>pcd</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>point cloud.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>inlier</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>point cloud after statistical filtering.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pl_preprocessing.PointcloudPrep.uni_down_filter">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uni_down_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pl_preprocessing.html#PointcloudPrep.uni_down_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pl_preprocessing.PointcloudPrep.uni_down_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uniform down sampling.</p>
+<p>Implement the uniform down sampling filtering.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>down_sample_pcd</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>point cloud after uniform sampling.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.pl_preprocessing.PointcloudPrep.voxel_down_filter">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">voxel_down_filter</span></span><a class="headerlink" href="#src.pl_preprocessing.PointcloudPrep.voxel_down_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Voxel down sampling.</p>
+<p>Implement the voxel down sampling.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>points</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ply</span></code></span></dt><dd><p>point cloud after voxel down sampling.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.stereorectify">
+<span id="src-stereorectify-module"></span><h2>src.stereorectify module<a class="headerlink" href="#module-src.stereorectify" title="Permalink to this heading">¶</a></h2>
+<p>author: yifeng
+date  : 10.04.2022</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.stereorectify.RectifyImages">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RectifyImages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rectify_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/stereorectify.html#RectifyImages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.stereorectify.RectifyImages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Rectification of the image pair.</p>
+<p>Rectification of the image pair.
+Draw the epi-polar lines to simplify the search of the corresponding feature points in left and right image.
+Please note that the used image pairs need to have overlapping parts,
+so that the subsequent point cloud registration can be implemented.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.stereorectify.RectifyImages.draw_line" title="src.stereorectify.RectifyImages.draw_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_line</span></code></a>(image1, image2)</p></td>
+<td><p>Draw lines to present the result of the rectified images.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.stereorectify.RectifyImages.rectify_image" title="src.stereorectify.RectifyImages.rectify_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rectify_image</span></code></a>(grayl, grayr)</p></td>
+<td><p>Implement the parallel rectification.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.stereorectify.RectifyImages.draw_line">
+<span class="sig-name descname"><span class="pre">draw_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/stereorectify.html#RectifyImages.draw_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.stereorectify.RectifyImages.draw_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw lines to present the result of the rectified images.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>image1</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>rectified left image.</p>
+</dd>
+<dt><strong>image2</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>rectified right image.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">horizontal</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">stacked</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">image</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">pair</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">with</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">polar</span></code> lines.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.stereorectify.RectifyImages.rectify_image">
+<span class="sig-name descname"><span class="pre">rectify_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grayl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grayr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/stereorectify.html#RectifyImages.rectify_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.stereorectify.RectifyImages.rectify_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the parallel rectification.</p>
+<p>rectify the image pair. Save and show them.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>grayl</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>gray image of left camera used for rectification.</p>
+</dd>
+<dt><strong>grayr</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>gray image of right camera used for rectification.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="Source code package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, University of Stuttgart IFF and Fraunhofer IPA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

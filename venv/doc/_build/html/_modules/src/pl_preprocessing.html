@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.pl_preprocessing &mdash; Masterarbeit 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Masterarbeit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Sequence of code execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about%20main.html">Introduction to the use of mian.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Source code package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Masterarbeit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>src.pl_preprocessing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.pl_preprocessing</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">open3d</span> <span class="k">as</span> <span class="nn">o3d</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="c1"># from open3d.open3d.geometry import voxel_down_sample, estimate_normals</span>
+
+<span class="c1"># pcd = o3d.io.read_point_cloud(&quot;C:\\Users\\Nutzer\\Desktop\\0422\\crop1 - Cloud.ply&quot;)</span>
+<span class="c1"># pcd = o3d.io.read_point_cloud(&quot;C:\\Users\\Nutzer\\Desktop\\0422\\pointcloud1_change.ply&quot;)</span>
+<span class="c1"># # pcd = o3d.io.read_point_cloud(&quot;C:\\Users\\Nutzer\\Desktop\\rectify\\camera1\\pointcloud.ply&quot;)</span>
+<span class="c1"># # pcd = o3d.io.read_point_cloud(path + &#39;\\&#39; + &quot;pointcloud.ply&quot;)</span>
+<span class="c1"># xyz = np.asarray(pcd.points)</span>
+<span class="c1"># print(&quot;\nOriginal pl without filtering has # to %d&quot; % (np.asarray(pcd.points).shape[0]))</span>
+<span class="c1">#</span>
+<span class="c1"># # show the original point cloud.</span>
+<span class="c1"># point_cloud = o3d.geometry.PointCloud()</span>
+<span class="c1"># point_cloud.points = o3d.utility.Vector3dVector(xyz)</span>
+<span class="c1"># o3d.visualization.draw_geometries([pcd], window_name=&#39;original&#39;, width=800, height=600)</span>
+
+
+<div class="viewcode-block" id="PointcloudPrep"><a class="viewcode-back" href="../../src.html#src.pl_preprocessing.PointcloudPrep">[docs]</a><span class="k">class</span> <span class="nc">PointcloudPrep</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Preprocessing of point cloud.</span>
+
+<span class="sd">    Implementation the point cloud downsampling and filtering.</span>
+<span class="sd">    Voxel downsampling, uni downsampling and statistical filtering, radius filtering can be chosen.</span>
+<span class="sd">    Normally, voxel downsampling + statistaical- + radius filtering are used sequentially.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pcd : ply</span>
+<span class="sd">            Point clouds that need to be pre-processed.</span>
+<span class="sd">        path : string</span>
+<span class="sd">            Path to save point cloud.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcd</span> <span class="o">=</span> <span class="n">pcd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">voxel_down_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Voxel down sampling.</span>
+
+<span class="sd">        Implement the voxel down sampling.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        points : ply</span>
+<span class="sd">            point cloud after voxel down sampling.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># The value of voxel_size needs to be tuned according to the requirements.</span>
+        <span class="n">voxel_size</span> <span class="o">=</span> <span class="mf">0.005</span>
+        <span class="c1"># Implementation of voxel down sampling.</span>
+        <span class="n">down_sample_pcd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pcd</span><span class="o">.</span><span class="n">voxel_down_sample</span><span class="p">(</span><span class="n">voxel_size</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Voxel Scale </span><span class="si">%f</span><span class="s2">, # of points </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">voxel_size</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">down_sample_pcd</span><span class="o">.</span><span class="n">points</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="c1"># visualization.</span>
+        <span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">draw_geometries</span><span class="p">([</span><span class="n">down_sample_pcd</span><span class="p">],</span> <span class="n">window_name</span><span class="o">=</span><span class="s2">&quot;voxel&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">down_sample_pcd</span>
+
+
+<div class="viewcode-block" id="PointcloudPrep.uni_down_filter"><a class="viewcode-back" href="../../src.html#src.pl_preprocessing.PointcloudPrep.uni_down_filter">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">uni_down_filter</span><span class="p">(</span><span class="n">pcd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Uniform down sampling.</span>
+
+<span class="sd">        Implement the uniform down sampling filtering.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        down_sample_pcd : ply</span>
+<span class="sd">            point cloud after uniform sampling.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># The value of every_k_points needs to be tuned according to the requirements.</span>
+        <span class="n">every_k_points</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="c1"># Implementation of uniform down sampling.</span>
+        <span class="n">down_sample_pcd</span> <span class="o">=</span> <span class="n">pcd</span><span class="o">.</span><span class="n">uniform_down_sample</span><span class="p">(</span><span class="n">every_k_points</span><span class="o">=</span><span class="n">every_k_points</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Uni Scale </span><span class="si">%f</span><span class="s2">, # of points </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">every_k_points</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">down_sample_pcd</span><span class="o">.</span><span class="n">points</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="c1"># visualization.</span>
+        <span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">draw_geometries</span><span class="p">([</span><span class="n">down_sample_pcd</span><span class="p">],</span> <span class="n">window_name</span><span class="o">=</span><span class="s2">&quot;uni_down&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">down_sample_pcd</span></div>
+
+
+<div class="viewcode-block" id="PointcloudPrep.statistical_removal"><a class="viewcode-back" href="../../src.html#src.pl_preprocessing.PointcloudPrep.statistical_removal">[docs]</a>    <span class="k">def</span> <span class="nf">statistical_removal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Implement statistical filtering.</span>
+
+<span class="sd">        remove the outlier points with statistical outlier remover filter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pcd : ply</span>
+<span class="sd">            point cloud.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        inlier : ply</span>
+<span class="sd">            point cloud after statistical filtering.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Num_neighbors and std_ratio need to be tuned according to the requirements.</span>
+        <span class="n">num_neighbors</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># Number of K-neighborhood points.</span>
+        <span class="n">std_ratio</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># The standard deviation multiplier.</span>
+        <span class="n">cl</span><span class="p">,</span> <span class="n">ind1</span> <span class="o">=</span> <span class="n">pcd</span><span class="o">.</span><span class="n">remove_statistical_outlier</span><span class="p">(</span><span class="n">nb_neighbors</span><span class="o">=</span><span class="n">num_neighbors</span><span class="p">,</span> <span class="n">std_ratio</span><span class="o">=</span><span class="n">std_ratio</span><span class="p">)</span>
+        <span class="n">inlier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_inlier_outlier</span><span class="p">(</span><span class="n">pcd</span><span class="p">,</span> <span class="n">ind1</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">inlier</span></div>
+
+<div class="viewcode-block" id="PointcloudPrep.radius_removal"><a class="viewcode-back" href="../../src.html#src.pl_preprocessing.PointcloudPrep.radius_removal">[docs]</a>    <span class="k">def</span> <span class="nf">radius_removal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Implement radius filtering.</span>
+
+<span class="sd">        remove the outlier points with radius outlier remover filter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pcd : ply</span>
+<span class="sd">            point cloud.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        inlier : ply</span>
+<span class="sd">            point cloud after statistical filtering.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Statistical_outlier_removal.</span>
+        <span class="n">nb_points</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># Number of neighborhood points.</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c1"># Radius size.</span>
+        <span class="n">cl</span><span class="p">,</span> <span class="n">ind2</span> <span class="o">=</span> <span class="n">pcd</span><span class="o">.</span><span class="n">remove_radius_outlier</span><span class="p">(</span><span class="n">nb_points</span><span class="o">=</span><span class="n">nb_points</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
+        <span class="n">inlier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_inlier_outlier</span><span class="p">(</span><span class="n">pcd</span><span class="p">,</span> <span class="n">ind2</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">inlier</span></div>
+
+        <span class="c1"># o3d.io.write_point_cloud(path + &#39;\\&#39; + &#39;afterfilter.ply&#39;, inliner)</span>
+
+
+<div class="viewcode-block" id="PointcloudPrep.display_inlier_outlier"><a class="viewcode-back" href="../../src.html#src.pl_preprocessing.PointcloudPrep.display_inlier_outlier">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">display_inlier_outlier</span><span class="p">(</span><span class="n">pcd</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Display inlier and outlier of the point cloud.</span>
+
+<span class="sd">        Display inlier and outlier of the point cloud.</span>
+<span class="sd">        The outliers are pained with yellow, the remaining inlier points are gray.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pcd : ply</span>
+<span class="sd">            point cloud.</span>
+<span class="sd">        ind : list(int)</span>
+<span class="sd">            the Serial Number of outliers.</span>
+<span class="sd">        stat : bool</span>
+<span class="sd">            True: show statistical filtering result.</span>
+<span class="sd">            False: show radius filtering result.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        inlier_cloud : ply</span>
+<span class="sd">            point cloud after filtering.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Outlier removal will be implemented&quot;</span><span class="p">)</span>
+        <span class="n">inlier_cloud</span> <span class="o">=</span> <span class="n">pcd</span><span class="o">.</span><span class="n">select_by_index</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+        <span class="n">outlier_cloud</span> <span class="o">=</span> <span class="n">pcd</span><span class="o">.</span><span class="n">select_by_index</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Painting the outliers with yellow.</span>
+        <span class="n">outlier_cloud</span><span class="o">.</span><span class="n">paint_uniform_color</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.706</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">inlier_cloud</span><span class="o">.</span><span class="n">paint_uniform_color</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Showing outliers (yellow) and inliers (gray): &quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">points </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">inlier_cloud</span><span class="o">.</span><span class="n">points</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">stat</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">draw_geometries</span><span class="p">([</span><span class="n">inlier_cloud</span><span class="p">,</span> <span class="n">outlier_cloud</span><span class="p">],</span> <span class="n">window_name</span><span class="o">=</span><span class="s2">&quot;statistical_outlier&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+                                               <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">draw_geometries</span><span class="p">([</span><span class="n">inlier_cloud</span><span class="p">,</span> <span class="n">outlier_cloud</span><span class="p">],</span> <span class="n">window_name</span><span class="o">=</span><span class="s2">&quot;radius_outlier&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+                                               <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">inlier_cloud</span></div>
+
+<div class="viewcode-block" id="PointcloudPrep.point_display"><a class="viewcode-back" href="../../src.html#src.pl_preprocessing.PointcloudPrep.point_display">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">point_display</span><span class="p">(</span><span class="n">pcd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Display point cloud.</span>
+
+<span class="sd">        Point cloud display.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pcd : ply</span>
+<span class="sd">            point cloud.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pcd = o3d.io.read_point_cloud(path + &#39;//&#39; + &#39;pointcloud_change5555555.ply&#39;)</span>
+        <span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pcd</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>
+        <span class="n">point_cloud</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">PointCloud</span><span class="p">()</span>
+        <span class="n">point_cloud</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">utility</span><span class="o">.</span><span class="n">Vector3dVector</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
+        <span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">draw_geometries</span><span class="p">([</span><span class="n">pcd</span><span class="p">],</span> <span class="n">window_name</span><span class="o">=</span><span class="s1">&#39;point cloud&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span></div></div>
+
+<span class="c1">####################################################################################</span>
+<span class="c1"># # The following sentences are used for point cloud preprocessing.</span>
+<span class="c1"># # If you want to implemente voxel down sampling, statistical and radius filtering,</span>
+<span class="c1"># # please activate the following sentence.</span>
+
+<span class="c1"># print(&#39;Please enter the camera ID of the point cloud that needs to be preprocessed.&#39;)</span>
+<span class="c1"># a = input(&quot;Pointcloud:&quot;)</span>
+<span class="c1"># pl_name = &#39;pointcloud&#39; + a</span>
+<span class="c1"># print(&quot;plname:&quot;, pl_name)</span>
+<span class="c1"># # get the current working directory.</span>
+<span class="c1"># cur_dir = os.path.abspath(os.path.dirname((__file__)))</span>
+<span class="c1"># print(cur_dir)</span>
+<span class="c1"># # get upper directory.</span>
+<span class="c1"># upper = os.path.abspath(os.path.join(os.getcwd(), &quot;..&quot;))</span>
+<span class="c1"># name = os.path.join(upper, &#39;images&#39;, &#39;device&#39; + str(a), str(pl_name) + &#39;.ply&#39;)</span>
+<span class="c1"># print(&quot;namenamename:&quot;, name)</span>
+<span class="c1"># print(&quot;upper:&quot;, upper)</span>
+<span class="c1"># pcd = o3d.io.read_point_cloud(name)</span>
+<span class="c1"># path = os.path.join(upper, &#39;images&#39;, &#39;device&#39; + str(a))</span>
+<span class="c1"># pl5 = PointcloudPrep(pcd, path)</span>
+<span class="c1"># voxel_down = pl5.voxel_down_filter</span>
+<span class="c1"># stat = pl5.statistical_removal(voxel_down)</span>
+<span class="c1"># radi = pl5.radius_removal(stat)</span>
+
+<span class="c1"># down_sample_pcd = down_sample_filter(pcd)</span>
+<span class="c1"># outlier_removal = outlier_removal(down_sample_pcd)</span>
+<span class="c1"># outlier_removal2 = outlier_removal(outlier_removal, stat=False)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, University of Stuttgart IFF and Fraunhofer IPA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.stereorectify &mdash; Masterarbeit 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Masterarbeit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Sequence of code execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about%20main.html">Introduction to the use of mian.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Source code package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Masterarbeit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>src.stereorectify</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.stereorectify</h1><div class="highlight"><pre>
+<span></span><span class="c1"># !/usr/bin/env python</span>
+<span class="c1"># -*- coding:utf-8 -*- </span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">author: yifeng</span>
+<span class="sd">date  : 10.04.2022</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="RectifyImages"><a class="viewcode-back" href="../../src.html#src.stereorectify.RectifyImages">[docs]</a><span class="k">class</span> <span class="nc">RectifyImages</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Rectification of the image pair.</span>
+
+<span class="sd">    Rectification of the image pair.</span>
+<span class="sd">    Draw the epi-polar lines to simplify the search of the corresponding feature points in left and right image.</span>
+<span class="sd">    Please note that the used image pairs need to have overlapping parts,</span>
+<span class="sd">    so that the subsequent point cloud registration can be implemented.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rectify_model</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor function.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map1x</span> <span class="o">=</span> <span class="n">rectify_model</span><span class="p">[</span><span class="s1">&#39;stereo_left_mapx&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map1y</span> <span class="o">=</span> <span class="n">rectify_model</span><span class="p">[</span><span class="s1">&#39;stereo_left_mapy&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map2x</span> <span class="o">=</span> <span class="n">rectify_model</span><span class="p">[</span><span class="s1">&#39;stereo_right_mapx&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map2y</span> <span class="o">=</span> <span class="n">rectify_model</span><span class="p">[</span><span class="s1">&#39;stereo_right_mapy&#39;</span><span class="p">]</span>
+        <span class="c1"># Save path for parallel correction images.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+
+<div class="viewcode-block" id="RectifyImages.rectify_image"><a class="viewcode-back" href="../../src.html#src.stereorectify.RectifyImages.rectify_image">[docs]</a>    <span class="k">def</span> <span class="nf">rectify_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grayl</span><span class="p">,</span> <span class="n">grayr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Implement the parallel rectification.</span>
+
+<span class="sd">        rectify the image pair. Save and show them.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        grayl : array</span>
+<span class="sd">            gray image of left camera used for rectification.</span>
+<span class="sd">        grayr : array</span>
+<span class="sd">            gray image of right camera used for rectification.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Remap the un-rectified images to new images.</span>
+        <span class="n">rectified_img1</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">remap</span><span class="p">(</span><span class="n">grayl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">map1x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">map1y</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LINEAR</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span><span class="p">)</span>
+        <span class="n">rectified_img2</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">remap</span><span class="p">(</span><span class="n">grayr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">map2x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">map2y</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LINEAR</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span><span class="p">)</span>
+
+        <span class="c1"># # Image show.</span>
+        <span class="c1"># cv2.imshow(&#39;rect_img1&#39;, rectified_img1)</span>
+        <span class="c1"># cv2.waitKey(3000)</span>
+        <span class="c1"># cv2.imshow(&#39;rect_img2&#39;, rectified_img2)</span>
+        <span class="c1"># cv2.waitKey(3000)</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;//&#39;</span> <span class="o">+</span> <span class="s1">&#39;result1.png&#39;</span><span class="p">,</span> <span class="n">rectified_img1</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;//&#39;</span> <span class="o">+</span> <span class="s1">&#39;result2.png&#39;</span><span class="p">,</span> <span class="n">rectified_img2</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">rectified_img1</span><span class="p">,</span> <span class="n">rectified_img2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">resize</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">384</span><span class="p">))</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;//&#39;</span> <span class="o">+</span> <span class="s1">&#39;result3.png&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="c1"># Image show.</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;rec.png&quot;</span><span class="p">,</span> <span class="n">resize</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">()</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RectifyImages.draw_line"><a class="viewcode-back" href="../../src.html#src.stereorectify.RectifyImages.draw_line">[docs]</a>    <span class="k">def</span> <span class="nf">draw_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image1</span><span class="p">,</span> <span class="n">image2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draw lines to present the result of the rectified images.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        image1 : array</span>
+<span class="sd">            rectified left image.</span>
+<span class="sd">        image2 : array</span>
+<span class="sd">            rectified right image.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        horizontal stacked image pair with polar lines.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">image1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">image2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">image1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">image2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">image1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">:</span><span class="n">image1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">image1</span>
+        <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">image2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">image1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:]</span> <span class="o">=</span> <span class="n">image2</span>
+
+        <span class="c1"># Draw equally spaced parallel lines.</span>
+        <span class="c1"># For a clear display, these parallel lines will be represented at intervals in red and green.</span>
+        <span class="c1"># The interval of the lines are 50 pixels.</span>
+        <span class="n">line_interval</span> <span class="o">=</span> <span class="mi">50</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">height</span> <span class="o">//</span> <span class="n">line_interval</span><span class="p">):</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">line_interval</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k</span><span class="p">)),</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">width</span><span class="p">,</span> <span class="n">line_interval</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k</span><span class="p">)),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                     <span class="n">thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">lineType</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">LINE_AA</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">line_interval</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">width</span><span class="p">,</span> <span class="n">line_interval</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+                     <span class="n">thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">lineType</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">LINE_AA</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;withlines&quot;</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;//&#39;</span> <span class="o">+</span> <span class="s1">&#39;withlines.png&#39;</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">()</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, University of Stuttgart IFF and Fraunhofer IPA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
