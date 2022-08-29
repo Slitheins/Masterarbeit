@@ -1,5 +1,10 @@
 # Masterarbeit
 
+## Code description
+
+For a detailed description of the program, please refer to the following file.
+path is: Masterarbeit/venv/doc/_build/html/genindex.html
+
 ## Folder structure
 
 Please create a folder structured as follows：
